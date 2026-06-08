@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Mahima PG | Premium Student Housing near Manipal University Jaipur</title>
+  <meta name="description" content="Looking for the best PG near Manipal University Jaipur (MUJ)? Visit Mahima PG. Premium boys & girls accommodation with AC rooms, multi-cuisine mess, power backup & shuttle service.">
+  <meta name="keywords" content="Hostel near Manipal University Jaipur, muj, MUJ hostel, pg near manipal university jaipur, luxury pg muj, boys hostel muj, girls pg manipal jaipur, mahima pg">
+  <meta name="author" content="Mahima PG">
+  <meta name="robots" content="index, follow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- DEVELOPER NOTES:
+       - Phone numbers: +91 98290 33501 and +91 89059 69068 (also used in footer and contact section)
+       - WhatsApp number: configured in app.js as WHATSAPP_NUMBER (919829033501)
+       - Room prices: edit directly in the .room-price-tag elements inside #rooms below
+       - Gallery items: managed in the galleryMedia array at top of app.js
+       - House Rules text: edit directly in the #house-rules section below
+  -->
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Mahima PG | Premium Student Housing near Manipal University Jaipur">
+  <meta property="og:description" content="Premium boys & girls PG accommodation 600m from MUJ. AC rooms, multi-cuisine mess, power backup & shuttle service.">
+  <meta property="og:image" content="assets/room_single.png">
+  <meta property="og:url" content="https://mahimapg.example.com/">
+  <meta property="og:site_name" content="Mahima PG">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Mahima PG | Premium Student Housing near MUJ">
+  <meta name="twitter:description" content="Premium PG accommodation near Manipal University Jaipur with all modern amenities.">
+  <meta name="twitter:image" content="assets/room_single.png">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LodgingBusiness",
+    "name": "Mahima PG",
+    "description": "Premium student accommodation near Manipal University Jaipur with AC rooms, multi-cuisine mess, power backup and shuttle service.",
+    "image": "assets/room_single.png",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Near Dehmi Panchayat, MUJ Link Road, Dahmi Kalan",
+      "addressLocality": "Jaipur",
+      "addressRegion": "Rajasthan",
+      "postalCode": "303007",
+      "addressCountry": "IN"
+    },
+    "telephone": ["+91-9829033501", "+91-8905969068"],
+    "email": "mahimapg@gmail.com",
+    "priceRange": "₹₹",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "100"
+    }
+  }
+  </script>
+
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Floating WhatsApp Widget -->
+  <a href="https://wa.me/919829033501" class="whatsapp-widget" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp" id="whatsapp-widget">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+    </svg>
+  </a>
+
+  <!-- Header Section -->
+  <header class="header" id="header">
+    <div class="container">
+      <a href="#" class="logo">
+        <img src="assets/logo.png" alt="Mahima PG Logo">
+        <div class="logo-text">Mahima<span>PG</span></div>
+      </a>
+
+      <nav class="nav">
+        <ul class="nav-links" id="nav-links">
+          <li><a href="#hero" class="nav-link">Home</a></li>
+          <li><a href="#about" class="nav-link">About</a></li>
+          <li><a href="#rooms" class="nav-link">Rooms</a></li>
+          <li><a href="#amenities" class="nav-link">Amenities</a></li>
+          <li><a href="#gallery" class="nav-link">Gallery</a></li>
+          <li><a href="#testimonials" class="nav-link">Reviews</a></li>
+          <li><a href="#faq" class="nav-link">FAQ</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
+          <li class="nav-cta"><a href="#" class="btn btn-primary" data-enquiry-trigger>Enquire Now</a></li>
+        </ul>
+      </nav>
+
+      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle Navigation Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-content">
+          <div class="hero-tag">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            Premium Student Living
+          </div>
+          <h1 class="hero-title">Your Ultimate Home Away From <span>Home</span></h1>
+          <p class="hero-desc">Experience a comfortable, secure, and thriving community living just 600 meters from Manipal University Jaipur. Perfectly designed rooms, clean home-style meals, and modern conveniences await you.</p>
+          <div class="hero-btns">
+            <a href="#" class="btn btn-primary" data-enquiry-trigger>Schedule a Tour</a>
+            <a href="#rooms" class="btn btn-secondary">Explore Rooms</a>
+          </div>
+          <div class="hero-features">
+            <div class="hero-feat-item">
+              <div class="hero-feat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+              </div>
+              <div class="hero-feat-text">
+                <h4>Power Backup</h4>
+                <p>Generator Backup</p>
+              </div>
+            </div>
+            <div class="hero-feat-item">
+              <div class="hero-feat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+              </div>
+              <div class="hero-feat-text">
+                <h4>Premium Mess</h4>
+                <p>4 Nutritious Meals</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-image-wrapper">
+          <div class="hero-card-floating">
+            <img src="assets/room_single.png" alt="Single Premium Sharing Room Preview" width="400">
+            <div class="hero-card-badge">
+              <h3>Double Sharing</h3>
+              <p>Starting at ₹12,500/mo</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Bar -->
+  <section class="container">
+    <div class="stats">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">600m</div>
+          <div class="stat-label">From MUJ Main Gate</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">100+</div>
+          <div class="stat-label">Happy Residents</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">24/7</div>
+          <div class="stat-label">Power & Water Backup</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">4.8★</div>
+          <div class="stat-label">Student Reviews</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="section" id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-image-stack">
+          <img src="assets/room_double.png" alt="Premium Room Showcase" class="about-img-main" loading="lazy">
+          <img src="assets/room_single.png" alt="Cozy Single Room" class="about-img-sub" loading="lazy">
+        </div>
+        <div class="about-content">
+          <span class="section-tag">About Mahima PG</span>
+          <h2 class="section-title">Redefining Student Accommodation Standards</h2>
+          <p class="about-p">Mahima PG offers premium student living crafted to provide the comfort of home and the convenience of a modern facility. Located near Manipal University Jaipur, we focus on convenience, comfort, and a vibrant social fabric that fosters personal growth and study success.</p>
+          <div class="about-highlights">
+            <div class="about-highlight-card">
+              <div class="about-highlight-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/>
+                </svg>
+              </div>
+              <h3 class="about-highlight-title">High-Speed Wi-Fi</h3>
+              <p class="about-highlight-desc">Uninterrupted internet connection for studies and research.</p>
+            </div>
+            <div class="about-highlight-card">
+              <div class="about-highlight-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                  <line x1="8" y1="21" x2="16" y2="21"/>
+                  <line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+              </div>
+              <h3 class="about-highlight-title">Study Spaces</h3>
+              <p class="about-highlight-desc">Comfortable, quiet desks and high-speed Wi-Fi in rooms.</p>
+            </div>
+          </div>
+          <a href="#" class="btn btn-outline" data-enquiry-trigger>Check Availability</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rooms Showcase Section -->
+  <section class="section" id="rooms" style="background-color: var(--color-bg-white);">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Accommodation Packages</span>
+        <h2 class="section-title">Our Elegant Living Spaces</h2>
+        <p class="section-desc">Choose the accommodation that matches your comfort. We offer fully furnished single and double sharing layouts with elegant styling.</p>
+      </div>
+
+      <div class="rooms-grid">
+        <!-- Room 1: Single Sharing -->
+        <div class="room-card" id="room-single">
+          <div class="room-img-container">
+            <span class="room-badge">Private Space</span>
+            <img src="assets/room_single.png" alt="Single Sharing Room" loading="lazy">
+            <span class="room-price-tag">₹16,300/mo*</span>
+          </div>
+          <div class="room-info">
+            <h3 class="room-title">Single Sharing Premium Room</h3>
+            <p class="room-desc">Enjoy ultimate privacy and focus in a dedicated single room. Comes fully equipped with high-end modern furniture and layout designed for academic focus.</p>
+            <div class="room-specs">
+              <div class="room-spec-item">
+                <span class="room-spec-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                Individual AC & Geyser
+              </div>
+              <div class="room-spec-item">
+                <span class="room-spec-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                Work Desk & Wardrobe
+              </div>
+              <div class="room-spec-item">
+                <span class="room-spec-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                Attached Bathroom
+              </div>
+              <div class="room-spec-item">
+                <span class="room-spec-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                Daily Housekeeping
+              </div>
+            </div>
+            <a href="#" class="btn btn-outline room-book-btn" data-enquiry-trigger data-room="single">Request Booking</a>
+          </div>
+        </div>
+
+        <!-- Room 2: Double Sharing -->
+        <div class="room-card" id="room-double">
+          <div class="room-img-container">
+            <span class="room-badge">Shared Comfort</span>
+            <img src="assets/room_double.png" alt="Double Sharing Room" loading="lazy">
+            <span class="room-price-tag">₹12,500/mo*</span>
+          </div>
+          <div class="room-info">
+            <h3 class="room-title">Double Sharing Luxury Room</h3>
+            <p class="room-desc">Perfect for sharing with a friend or peer. Features separate dedicated study units, independent wardrobes, and shared climate control and bathroom facilities.</p>
+            <div class="room-specs">
+              <div class="room-spec-item">
+                <span class="room-spec-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                Shared AC & Geyser
+              </div>
+              <div class="room-spec-item">
+                <span class="room-spec-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                2 Separate Work Desks
+              </div>
+              <div class="room-spec-item">
+                <span class="room-spec-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                Attached Bathroom
+              </div>
+              <div class="room-spec-item">
+                <span class="room-spec-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                Daily Housekeeping
+              </div>
+            </div>
+            <a href="#" class="btn btn-outline room-book-btn" data-enquiry-trigger data-room="double">Request Booking</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Amenities Section -->
+  <section class="section" id="amenities">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">State-of-the-Art Facilities</span>
+        <h2 class="section-title">Designed For Modern Living</h2>
+        <p class="section-desc">Every detail at Mahima PG is planned to offer absolute convenience, health, and academic support.</p>
+      </div>
+
+      <div class="amenities-grid">
+        <div class="amenity-card">
+          <div class="amenity-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/>
+            </svg>
+          </div>
+          <h3 class="amenity-title">High-Speed Wi-Fi</h3>
+          <p class="amenity-desc">Uninterrupted ultra-fast Wi-Fi covers every corner of the PG for studies & streaming.</p>
+        </div>
+
+        <div class="amenity-card">
+          <div class="amenity-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <h3 class="amenity-title">Multi-Cuisine Mess</h3>
+          <p class="amenity-desc">4 daily hygienic meals serving healthy, home-style regional Indian food.</p>
+        </div>
+
+        <div class="amenity-card">
+          <div class="amenity-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+          </div>
+          <h3 class="amenity-title">Power Backup</h3>
+          <p class="amenity-desc">High capacity power generator backup ensuring zero failures during exams.</p>
+        </div>
+
+        <div class="amenity-card">
+          <div class="amenity-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <circle cx="12" cy="12" r="6"/>
+              <path d="M12 9a3 3 0 0 0-3 3"/>
+            </svg>
+          </div>
+          <h3 class="amenity-title">Laundry Service</h3>
+          <p class="amenity-desc">Twice-weekly managed laundry and iron services included for all residents.</p>
+        </div>
+
+        <div class="amenity-card">
+          <div class="amenity-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="15" rx="2" ry="2"/>
+              <path d="M17 2v5M7 2v5M2 12h20M7 16h10M7 12v4M17 12v4"/>
+            </svg>
+          </div>
+          <h3 class="amenity-title">Shuttle Service</h3>
+          <p class="amenity-desc">Managed pickup and drop shuttles to the Manipal University campus gate.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filterable Gallery Section -->
+  <section class="section" id="gallery" style="background-color: var(--color-bg-white);">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Visual Tour</span>
+        <h2 class="section-title">Life at Mahima PG</h2>
+        <p class="section-desc">Take a visual tour around our campus rooms, dining hall and student spaces.</p>
+      </div>
+
+      <div class="gallery-filters">
+        <button class="filter-btn active" data-filter="all">All Photos</button>
+        <button class="filter-btn" data-filter="rooms">Rooms</button>
+        <button class="filter-btn" data-filter="facilities">Facilities</button>
+      </div>
+
+      <!-- DEVELOPER: Gallery items are rendered dynamically from galleryMedia array in app.js -->
+      <div class="gallery-grid" id="gallery-grid"></div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="section testimonials" id="testimonials">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" style="background-color: rgba(255,255,255,0.1); color: var(--color-accent);">Testimonials</span>
+        <h2 class="section-title">What Our Residents Say</h2>
+      </div>
+
+      <div class="testimonials-slider" id="testimonials-slider">
+        <div class="testimonial-slide active">
+          <p class="testimonial-quote">"Mahima PG has been the perfect place for my stay while studying at MUJ. The shuttle drop service makes going to classes super simple, and the mess food is clean and actually tastes like home!"</p>
+          <div class="testimonial-user">
+            <div class="testimonial-avatar">AS</div>
+            <div class="testimonial-meta">
+              <h4>Amit Sharma</h4>
+              <p>B.Tech CSE, MUJ (Batch 2024)</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-slide">
+          <p class="testimonial-quote">"Finding a good PG near MUJ that offers reliable power backup and laundry service was key for me. Mahima PG delivers exactly what is promised, making college life stress-free."</p>
+          <div class="testimonial-user">
+            <div class="testimonial-avatar">KP</div>
+            <div class="testimonial-meta">
+              <h4>Kriti Patel</h4>
+              <p>B.Design, MUJ (Batch 2025)</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-slide">
+          <p class="testimonial-quote">"The power backup is a lifesaver during Jaipur summers and semester final prep. The Wi-Fi speeds are also consistently high which is great for coding projects and zoom meetings."</p>
+          <div class="testimonial-user">
+            <div class="testimonial-avatar">RN</div>
+            <div class="testimonial-meta">
+              <h4>Rahul Nair</h4>
+              <p>BCA Student, MUJ (Batch 2024)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slider-dots" id="slider-dots">
+        <span class="slider-dot active" data-index="0"></span>
+        <span class="slider-dot" data-index="1"></span>
+        <span class="slider-dot" data-index="2"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Common Inquiries</span>
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        <p class="section-desc">Have questions about stays, billing, or policies? We have compiled responses to typical questions.</p>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-question">
+            <h3>How far is Mahima PG from Manipal University Jaipur?</h3>
+            <span class="faq-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              We are located approximately 600–700 meters from the main gate of Manipal University Jaipur (MUJ). This makes it a quick 8-10 minute walk. Additionally, we provide scheduled shuttle drops for students during college entry/exit hours.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <h3>Are meals included in the monthly package?</h3>
+            <span class="faq-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              Yes, our room packages include four meals daily (Breakfast, Lunch, High Tea, and Dinner) cooked in our hygienic in-house kitchen. We offer a varied weekly vegetarian menu focused on nutrition and taste.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <h3>Are laundry and cleaning services included?</h3>
+            <span class="faq-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              Yes, daily room housekeeping and twice-weekly laundry and ironing services are fully included in all packages with no additional charges.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <h3>What is the process to lock in a booking?</h3>
+            <span class="faq-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              You can initiate a request using our online Contact Form, send us a query on WhatsApp, or call our team directly. To secure your room, a booking token advance along with standard student registration documents is required.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- House Rules Section -->
+  <section class="section" id="house-rules" style="background-color: var(--color-bg-white);">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Important Guidelines</span>
+        <h2 class="section-title">House Rules</h2>
+        <p class="section-desc">A few simple guidelines that keep Mahima PG safe, peaceful and productive for every resident.</p>
+      </div>
+
+      <div class="rules-grid">
+        <div class="rule-card">
+          <div class="rule-icon">🚭</div>
+          <h3 class="rule-title">No Smoking or Substances</h3>
+          <p class="rule-desc">Smoking, alcohol, and any substance use are strictly prohibited inside the PG premises.</p>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-icon">🌙</div>
+          <h3 class="rule-title">Quiet Hours</h3>
+          <p class="rule-desc">Maintain silence between 10:30 PM and 7:00 AM so that fellow residents can rest and study.</p>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-icon">👥</div>
+          <h3 class="rule-title">Visitor Policy</h3>
+          <p class="rule-desc">Day visitors are allowed in common areas till 8:00 PM. Overnight guests are not permitted.</p>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-icon">🍳</div>
+          <h3 class="rule-title">No Cooking in Rooms</h3>
+          <p class="rule-desc">For safety reasons, cooking and electrical heating appliances are not allowed inside rooms.</p>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-icon">💳</div>
+          <h3 class="rule-title">Rent Payment Deadline</h3>
+          <p class="rule-desc">Monthly rent is due by the 5th of every month. A late fee applies after the 7th.</p>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-icon">🧹</div>
+          <h3 class="rule-title">Room Cleanliness</h3>
+          <p class="rule-desc">Keep your room tidy and cooperate with daily housekeeping staff for a hygienic environment.</p>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-icon">🔧</div>
+          <h3 class="rule-title">Report Maintenance Issues</h3>
+          <p class="rule-desc">Report any electrical, plumbing or furniture issues to the warden within 24 hours.</p>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-icon">🔑</div>
+          <h3 class="rule-title">Do Not Share Access</h3>
+          <p class="rule-desc">Never share room keys, access cards or PG gate codes with outsiders for your own safety.</p>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-icon">🛡️</div>
+          <h3 class="rule-title">Respect & Safety</h3>
+          <p class="rule-desc">Treat staff and fellow residents with respect. Any harassment or misconduct will not be tolerated.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="section" id="contact">
+    <div class="container">
+      <div class="contact-grid">
+        <div class="contact-info">
+          <div>
+            <span class="section-tag">Reach Out</span>
+            <h2 class="section-title" style="margin-bottom: 24px;">Get In Touch Or Visit Us</h2>
+            <p class="about-p" style="margin-bottom: 40px;">Want to book a room or visit our property? Call us directly, send us a WhatsApp message, or drop by. We are happy to show you around!</p>
+
+            <div class="contact-details">
+              <div class="contact-detail-item">
+                <div class="contact-detail-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                  </svg>
+                </div>
+                <div class="contact-detail-content">
+                  <h4>PG Address</h4>
+                  <p>Near Dehmi Panchayat, MUJ Link Road, Dahmi Kalan, Jaipur, Rajasthan 303007</p>
+                </div>
+              </div>
+
+              <div class="contact-detail-item">
+                <div class="contact-detail-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                </div>
+                <div class="contact-detail-content">
+                  <h4>Phone Numbers</h4>
+                  <p><a href="tel:+919829033501">+91 98290 33501</a> | <a href="tel:+918905969068">+91 89059 69068</a></p>
+                </div>
+              </div>
+
+              <div class="contact-detail-item">
+                <div class="contact-detail-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                  </svg>
+                </div>
+                <div class="contact-detail-content">
+                  <h4>Email Support</h4>
+                  <p><a href="mailto:mahimapg@gmail.com">mahimapg@gmail.com</a></p>
+                </div>
+              </div>
+            </div>
+
+            <a href="#" class="btn btn-primary" data-enquiry-trigger>Send an Enquiry</a>
+          </div>
+        </div>
+
+        <div class="contact-map-card" style="height: auto; min-height: 400px;">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3458.0983492016676!2d75.5670964!3d26.837414!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396c4968bd93bca3%3A0x7a6e78cd991eb6dc!2sMahima%20Hostel%20-Near%20Manipal%20University%20Jaipur!5e1!3m2!1sen!2sin!4v1780680118573!5m2!1sen!2sin" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mahima PG Location on Google Maps"></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>Mahima PG</h3>
+          <p>Providing premium student accommodations and foster active student growth since establishment. Located close to Manipal University Jaipur.</p>
+          <p>Managed with care & focus on safety, nutrition and support.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Navigation</h4>
+          <ul class="footer-links-list">
+            <li class="footer-link-item"><a href="#hero">Home</a></li>
+            <li class="footer-link-item"><a href="#about">About</a></li>
+            <li class="footer-link-item"><a href="#rooms">Rooms</a></li>
+            <li class="footer-link-item"><a href="#amenities">Amenities</a></li>
+            <li class="footer-link-item"><a href="#gallery">Gallery</a></li>
+            <li class="footer-link-item"><a href="#house-rules">House Rules</a></li>
+            <li class="footer-link-item"><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact">
+          <h4>Contact Info</h4>
+          <ul class="footer-contact-list">
+            <li class="footer-contact-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span>Near Dehmi Panchayat, MUJ Link Road, Dahmi Kalan, Jaipur, 303007</span>
+            </li>
+            <li class="footer-contact-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+              <span>+91 9829033501, +91 8905969068</span>
+            </li>
+            <li class="footer-contact-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <span>mahimapg@gmail.com</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>&copy; 2026 Mahima PG. All rights reserved. Designed for MUJ Students.</div>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Enquiry Modal -->
+  <div class="modal" id="enquiry-modal" role="dialog" aria-modal="true" aria-labelledby="enquiry-modal-title" aria-hidden="true">
+    <div class="modal-backdrop" data-modal-close></div>
+    <div class="modal-card" role="document">
+      <button class="modal-close" data-modal-close aria-label="Close enquiry form">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <div class="modal-header">
+        <span class="section-tag">Quick Enquiry</span>
+        <h3 id="enquiry-modal-title">Book Your Stay at Mahima PG</h3>
+        <p>Fill in your details and we'll connect with you on WhatsApp within minutes.</p>
+      </div>
+      <form class="enquiry-form" id="enquiry-form" novalidate>
+        <div class="form-group-row">
+          <div class="form-group">
+            <label class="form-label" for="enq-name">Full Name *</label>
+            <input class="form-control" type="text" id="enq-name" name="name" required>
+            <span class="form-error" data-error-for="name"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="enq-phone">Phone *</label>
+            <input class="form-control" type="tel" id="enq-phone" name="phone" required>
+            <span class="form-error" data-error-for="phone"></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="enq-email">Email</label>
+          <input class="form-control" type="email" id="enq-email" name="email">
+        </div>
+        <div class="form-group-row">
+          <div class="form-group">
+            <label class="form-label" for="enq-room">Preferred Room</label>
+            <select class="form-control" id="enq-room" name="room">
+              <option value="">Any / Not sure</option>
+              <option value="single">Single Sharing (₹16,300/mo)</option>
+              <option value="double">Double Sharing (₹12,500/mo)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="enq-date">Move-in Date</label>
+            <input class="form-control" type="date" id="enq-date" name="date">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="enq-message">Message</label>
+          <textarea class="form-control" id="enq-message" name="message" rows="3" placeholder="Any specific requirements or questions?"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+            </svg>
+            Send on WhatsApp
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Gallery Lightbox">
+    <button class="lightbox-close" data-lightbox-close aria-label="Close lightbox">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+    <button class="lightbox-arrow lightbox-prev" data-lightbox-prev aria-label="Previous">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="lightbox-content" id="lightbox-content"></div>
+    <button class="lightbox-arrow lightbox-next" data-lightbox-next aria-label="Next">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="lightbox-counter" id="lightbox-counter"></div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+      <polyline points="22 4 12 14.01 9 11.01"/>
+    </svg>
+    <span id="toast-message">Inquiry submitted successfully!</span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
