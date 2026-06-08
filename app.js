@@ -10,7 +10,7 @@
  *     - alt: accessible label / caption
  * ============================================================ */
 
-const WHATSAPP_NUMBER = '919829033501';
+const WHATSAPP_NUMBER = '918209810772';
 
 /* ------------------------------------------------------------
  * Gallery media — EDIT HERE to add/remove gallery items
