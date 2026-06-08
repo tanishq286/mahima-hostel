@@ -282,8 +282,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!valid) return;
 
     const roomLabel = {
-      single: 'Single Sharing (₹16,300/mo)',
-      double: 'Double Sharing (₹12,500/mo)',
+      single: 'Single Sharing',
+      double: 'Double Sharing',
     }[data.room] || 'Not specified';
 
     const lines = [
