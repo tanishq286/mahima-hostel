@@ -12,6 +12,10 @@ on:
       - '.github/workflows/build-deepwarden.yml'
   workflow_dispatch:
 
+# Needed so the build can publish the APK as a downloadable GitHub Release.
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -42,13 +46,32 @@ jobs:
       - name: Build debug APK
         run: gradle assembleDebug --no-daemon --stacktrace
 
-      - name: Upload debug APK
+      - name: Upload debug APK (Actions artifact)
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: deepwarden-debug-apk
           path: deepwarden/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+      # Publish the APK as a GitHub Release asset — a direct, tappable download
+      # on a phone (no zip, no login, visible in the GitHub mobile app).
+      - name: Publish APK to a GitHub Release
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: deepwarden-latest
+          name: DeepWarden — latest debug build
+          body: |
+            Latest DeepWarden debug APK, built automatically from the
+            `claude/phantomguard-deepforge-android-ul4zvz` branch.
+
+            **Install on a phone:** tap `app-debug.apk` below to download,
+            then open it and allow "install unknown apps".
+
+            This is a debug build for personal testing.
+          files: deepwarden/app/build/outputs/apk/debug/*.apk
+          make_latest: true
 
       - name: Upload test report (on failure)
         if: failure()
