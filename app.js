@@ -1,5 +1,5 @@
 /* ============================================================
- * Mahima PG - app.js
+ * Mahima Hostel - app.js
  * DEVELOPER NOTES:
  *   - WHATSAPP_NUMBER: change here to update the WhatsApp target
  *   - galleryMedia: add or remove gallery items (images & videos)
@@ -13,9 +13,12 @@
 const WHATSAPP_NUMBER = '918209810772';
 
 /* ------------------------------------------------------------
- * Gallery media — EDIT HERE to add/remove gallery items
+ * Gallery media — loaded from gallery.json at runtime.
+ * Manage items via admin.html (client) or edit gallery.json
+ * directly in the repo (developer). The list below is only a
+ * fallback if gallery.json fails to load.
  * ------------------------------------------------------------ */
-const galleryMedia = [
+let galleryMedia = [
   { type: 'image', category: 'rooms',      src: 'assets/room_single.png',  alt: 'Single Sharing Room Interior' },
   { type: 'image', category: 'rooms',      src: 'assets/room_double.png',  alt: 'Double Sharing Room Interior' },
   { type: 'image', category: 'facilities', src: 'assets/mess.png',         alt: 'Clean Student Mess Dining' },
@@ -107,6 +110,18 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   renderGallery('all');
+
+  // Load gallery items from gallery.json (managed via admin.html)
+  fetch('gallery.json', { cache: 'no-store' })
+    .then(res => res.ok ? res.json() : Promise.reject())
+    .then(data => {
+      if (Array.isArray(data.items) && data.items.length) {
+        galleryMedia = data.items;
+        const activeFilter = document.querySelector('.filter-btn.active');
+        renderGallery(activeFilter ? activeFilter.dataset.filter : 'all');
+      }
+    })
+    .catch(() => { /* keep fallback list */ });
 
   /* ----- 4. Lightbox ----- */
   const lightbox = document.getElementById('lightbox');
@@ -287,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }[data.room] || 'Not specified';
 
     const lines = [
-      '*New Enquiry — Mahima PG*',
+      '*New Enquiry — Mahima Hostel*',
       '',
       `*Name:* ${data.name}`,
       `*Phone:* ${data.phone}`,
