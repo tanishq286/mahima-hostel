@@ -65,9 +65,11 @@ class ScanOrchestrator @Inject constructor(
                 DetectionLayer.CLOUD_REPUTATION to { layer7.scan(vtKey) }
             } else null
 
-        // Emergency: fastest, highest-leverage checks first.
-        val order: List<Pair<DetectionLayer, suspend () -> Pair<List<Finding>, List<String>>>> =
-            (if (emergency) listOf(
+        // Emergency: fastest, highest-leverage checks first. The explicit type
+        // annotation on baseOrder is what makes the lambdas infer as `suspend`;
+        // we append the optional cloud step afterwards to keep that inference.
+        val baseOrder: List<Pair<DetectionLayer, suspend () -> Pair<List<Finding>, List<String>>>> =
+            if (emergency) listOf(
                 DetectionLayer.SYSTEM_INTEGRITY to { layer3.scan() },
                 DetectionLayer.NETWORK_FORENSICS to { layer4.scan() },
                 DetectionLayer.STATIC_FORENSICS to { layer1.scan() },
@@ -79,7 +81,8 @@ class ScanOrchestrator @Inject constructor(
                 DetectionLayer.SYSTEM_INTEGRITY to { layer3.scan() },
                 DetectionLayer.NETWORK_FORENSICS to { layer4.scan() },
                 DetectionLayer.CONTENT_ANALYSIS to { layer6.scan() },
-            )) + listOfNotNull(cloudStep)
+            )
+        val order = baseOrder + listOfNotNull(cloudStep)
 
         for ((layer, run) in order) {
             _progress.value = _progress.value.copy(runningLayer = layer)
