@@ -31,7 +31,12 @@ import javax.inject.Singleton
 class ThreatScoringEngine @Inject constructor() {
 
     fun score(findings: List<Finding>): DeviceThreatScore {
-        val static = dimension(findings, DetectionLayer.STATIC_FORENSICS, DetectionLayer.ADB_DEEP_FORENSICS)
+        val static = dimension(
+            findings,
+            DetectionLayer.STATIC_FORENSICS,
+            DetectionLayer.ADB_DEEP_FORENSICS,
+            DetectionLayer.CLOUD_REPUTATION,
+        )
         val behavioral = dimension(findings, DetectionLayer.BEHAVIORAL_HEURISTICS, DetectionLayer.CONTENT_ANALYSIS)
         val system = dimension(findings, DetectionLayer.SYSTEM_INTEGRITY)
         val network = dimension(findings, DetectionLayer.NETWORK_FORENSICS)

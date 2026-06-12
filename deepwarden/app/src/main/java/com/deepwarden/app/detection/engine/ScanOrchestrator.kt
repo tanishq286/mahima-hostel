@@ -10,6 +10,9 @@ import com.deepwarden.app.detection.layer2.BehavioralHeuristicsScanner
 import com.deepwarden.app.detection.layer3.SystemIntegrityScanner
 import com.deepwarden.app.detection.layer4.NetworkForensicsScanner
 import com.deepwarden.app.detection.layer6.ContentAnalysisScanner
+import com.deepwarden.app.detection.layer7.CloudReputationScanner
+import com.deepwarden.app.data.datastore.SettingsRepository
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,8 +35,10 @@ class ScanOrchestrator @Inject constructor(
     private val layer3: SystemIntegrityScanner,
     private val layer4: NetworkForensicsScanner,
     private val layer6: ContentAnalysisScanner,
+    private val layer7: CloudReputationScanner,
     private val scoring: ThreatScoringEngine,
     private val history: ScanHistoryRepository,
+    private val settings: SettingsRepository,
 ) {
     data class Progress(
         val runningLayer: DetectionLayer? = null,
@@ -52,9 +57,17 @@ class ScanOrchestrator @Inject constructor(
         val limitations = mutableListOf<String>()
         val started = System.currentTimeMillis()
 
+        // Cloud reputation (Layer 7) only when the user enabled it and set a key.
+        val cloudEnabled = settings.cloudRepEnabled.first()
+        val vtKey = settings.vtApiKey.first()
+        val cloudStep: Pair<DetectionLayer, suspend () -> Pair<List<Finding>, List<String>>>? =
+            if (cloudEnabled && vtKey.isNotBlank()) {
+                DetectionLayer.CLOUD_REPUTATION to { layer7.scan(vtKey) }
+            } else null
+
         // Emergency: fastest, highest-leverage checks first.
         val order: List<Pair<DetectionLayer, suspend () -> Pair<List<Finding>, List<String>>>> =
-            if (emergency) listOf(
+            (if (emergency) listOf(
                 DetectionLayer.SYSTEM_INTEGRITY to { layer3.scan() },
                 DetectionLayer.NETWORK_FORENSICS to { layer4.scan() },
                 DetectionLayer.STATIC_FORENSICS to { layer1.scan() },
@@ -66,7 +79,7 @@ class ScanOrchestrator @Inject constructor(
                 DetectionLayer.SYSTEM_INTEGRITY to { layer3.scan() },
                 DetectionLayer.NETWORK_FORENSICS to { layer4.scan() },
                 DetectionLayer.CONTENT_ANALYSIS to { layer6.scan() },
-            )
+            )) + listOfNotNull(cloudStep)
 
         for ((layer, run) in order) {
             _progress.value = _progress.value.copy(runningLayer = layer)

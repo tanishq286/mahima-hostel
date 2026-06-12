@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,6 +17,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
@@ -42,12 +45,16 @@ class SettingsViewModel @Inject constructor(
     val intelAutoUpdate = settings.intelAutoUpdate.stateIn(viewModelScope, SharingStarted.Eagerly, false)
     val contentLayer = settings.contentLayerEnabled.stateIn(viewModelScope, SharingStarted.Eagerly, false)
     val scheduledHours = settings.scheduledScanHours.stateIn(viewModelScope, SharingStarted.Eagerly, 0)
+    val cloudRep = settings.cloudRepEnabled.stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    val vtApiKey = settings.vtApiKey.stateIn(viewModelScope, SharingStarted.Eagerly, "")
 
     fun completeOnboarding() = viewModelScope.launch { settings.setOnboardingDone() }
     fun setSafeMode(v: Boolean) = viewModelScope.launch { settings.setSafeMode(v) }
     fun setContributeIoc(v: Boolean) = viewModelScope.launch { settings.setContributeIoc(v) }
     fun setIntelAutoUpdate(v: Boolean) = viewModelScope.launch { settings.setIntelAutoUpdate(v) }
     fun setContentLayer(v: Boolean) = viewModelScope.launch { settings.setContentLayerEnabled(v) }
+    fun setCloudRep(v: Boolean) = viewModelScope.launch { settings.setCloudRepEnabled(v) }
+    fun setVtApiKey(v: String) = viewModelScope.launch { settings.setVtApiKey(v) }
     fun setScheduledScan(enabled: Boolean) = viewModelScope.launch {
         val hours = if (enabled) 24 else 0
         settings.setScheduledScanHours(hours)
@@ -63,12 +70,37 @@ fun SettingsScreen(vm: SettingsViewModel = hiltViewModel()) {
     val autoUpdate by vm.intelAutoUpdate.collectAsState()
     val contentLayer by vm.contentLayer.collectAsState()
     val scheduled by vm.scheduledHours.collectAsState()
+    val cloudRep by vm.cloudRep.collectAsState()
+    val vtKey by vm.vtApiKey.collectAsState()
 
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         Text("Settings", style = MaterialTheme.typography.headlineMedium)
+
+        // ---- Cloud reputation (Layer 7) -----------------------------------
+        Toggle(
+            "Cloud reputation — VirusTotal (Layer 7)", cloudRep, vm::setCloudRep,
+            "The strongest detection DeepWarden offers: checks your sideloaded apps against 70+ antivirus engines worldwide. Only the app's hash is sent — never the app, never personal data. Needs your own free API key below.",
+        )
+        if (cloudRep) {
+            val visual = if (vtKey.isBlank()) VisualTransformation.None else PasswordVisualTransformation()
+            OutlinedTextField(
+                value = vtKey,
+                onValueChange = vm::setVtApiKey,
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("VirusTotal API key") },
+                singleLine = true,
+                visualTransformation = visual,
+            )
+            Text(
+                "Get a free key: virustotal.com → sign up → your profile → API key. It is stored only on this phone. " +
+                    if (vtKey.isBlank()) "Paste it here to activate cloud checks." else "Key saved ✓ — cloud checks active on the next scan.",
+                style = MaterialTheme.typography.bodySmall,
+                color = if (vtKey.isBlank()) DwColors.WarnOrange else DwColors.CalmGreen,
+            )
+        }
 
         Toggle(
             "Safe Mode (No Data Loss)", safeMode, vm::setSafeMode,

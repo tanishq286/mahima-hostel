@@ -66,6 +66,7 @@ enum class DetectionLayer(val displayName: String, val depthRank: Int) {
     NETWORK_FORENSICS("Layer 4 · Network & Exfiltration", 4),
     ADB_DEEP_FORENSICS("Layer 5 · ADB Deep Forensics", 5),
     CONTENT_ANALYSIS("Layer 6 · Content Analysis", 2),
+    CLOUD_REPUTATION("Layer 7 · Cloud Reputation", 4),
 }
 
 enum class Severity(val weight: Int, val displayName: String) {
