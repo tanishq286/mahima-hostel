@@ -43,34 +43,52 @@ jobs:
       - name: Run unit tests (scoring, parsers, data-safety guarantees)
         run: gradle testDebugUnitTest --no-daemon --stacktrace
 
-      - name: Build debug APK
-        run: gradle assembleDebug --no-daemon --stacktrace
+      # Build a properly release-signed APK using the committed stable keystore.
+      # A real signature (vs the debug key) is what stops Play Protect from
+      # hard-blocking the sideloaded install. SMS and all permissions are kept.
+      # The keystore is committed deliberately for reproducible, update-safe
+      # personal builds; it is NOT a Play Store upload key.
+      - name: Build signed release APK
+        env:
+          DW_KEYSTORE_PATH: ${{ github.workspace }}/deepwarden/app/deepwarden-release.jks
+          DW_STORE_PASSWORD: deepwarden
+          DW_KEY_ALIAS: deepwarden
+          DW_KEY_PASSWORD: deepwarden
+        run: gradle assembleRelease --no-daemon --stacktrace
 
-      - name: Upload debug APK (Actions artifact)
+      - name: Rename APK for clarity
+        run: |
+          mkdir -p "$RUNNER_TEMP/out"
+          cp app/build/outputs/apk/release/*.apk "$RUNNER_TEMP/out/DeepWarden.apk"
+
+      - name: Upload signed APK (Actions artifact)
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: deepwarden-debug-apk
-          path: deepwarden/app/build/outputs/apk/debug/*.apk
+          name: deepwarden-release-apk
+          path: ${{ runner.temp }}/out/DeepWarden.apk
           if-no-files-found: error
 
-      # Publish the APK as a GitHub Release asset — a direct, tappable download
-      # on a phone (no zip, no login, visible in the GitHub mobile app).
+      # Publish the signed APK as a GitHub Release asset — a direct, tappable
+      # download on a phone (no zip, no login, visible in the GitHub mobile app).
       - name: Publish APK to a GitHub Release
         if: success()
         uses: softprops/action-gh-release@v2
         with:
           tag_name: deepwarden-latest
-          name: DeepWarden — latest debug build
+          name: DeepWarden — latest build
           body: |
-            Latest DeepWarden debug APK, built automatically from the
-            `claude/phantomguard-deepforge-android-ul4zvz` branch.
+            Latest DeepWarden APK, built and **release-signed** automatically
+            from the `claude/phantomguard-deepforge-android-ul4zvz` branch.
+            SMS message-scanning (Layer 6) is included.
 
-            **Install on a phone:** tap `app-debug.apk` below to download,
+            **Install on a phone:** tap `DeepWarden.apk` below to download,
             then open it and allow "install unknown apps".
 
-            This is a debug build for personal testing.
-          files: deepwarden/app/build/outputs/apk/debug/*.apk
+            If Play Protect still warns, open Play Store → profile → Play
+            Protect → settings (gear) → turn off scanning, install, turn it
+            back on.
+          files: ${{ runner.temp }}/out/DeepWarden.apk
           make_latest: true
 
       - name: Upload test report (on failure)

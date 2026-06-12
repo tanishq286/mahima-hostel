@@ -26,15 +26,39 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Release signing. The keystore + passwords are supplied via environment
+    // variables (generated/held by CI). A real release signature greatly
+    // reduces Play Protect's hard-blocking of sideloaded installs compared to
+    // the throwaway debug key — without touching any app permission (SMS stays).
+    signingConfigs {
+        create("release") {
+            val storePath = System.getenv("DW_KEYSTORE_PATH")
+            if (storePath != null) {
+                storeFile = file(storePath)
+                storePassword = System.getenv("DW_STORE_PASSWORD")
+                keyAlias = System.getenv("DW_KEY_ALIAS")
+                keyPassword = System.getenv("DW_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // R8 shrinking ON. Keep rules protect reflection-reached detection classes.
-            isMinifyEnabled = true
-            isShrinkResources = true
+            // Shrinking OFF for these self-built APKs: it guarantees the release
+            // installs and runs without R8 surprises (we can't hand-test here).
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Use the release signing config only when CI provided a keystore;
+            // otherwise fall back so local `assembleRelease` still works.
+            signingConfig = if (System.getenv("DW_KEYSTORE_PATH") != null) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
         debug {
             applicationIdSuffix = ".debug"
