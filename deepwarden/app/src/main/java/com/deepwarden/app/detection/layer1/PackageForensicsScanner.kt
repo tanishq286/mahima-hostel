@@ -65,7 +65,8 @@ class PackageForensicsScanner @Inject constructor(
             val label = pm.getApplicationLabel(app).toString()
 
             // ---- 1. Install source forensics --------------------------------
-            val installer = installerOf(pkg.packageName)
+            val source = com.deepwarden.app.detection.common.InstallerTrust.of(context, pkg.packageName)
+            val installer = source.installer
             val sideloaded = !isSystem && installer == null
             if (sideloaded) {
                 findings += sideloadFinding(pkg, label)
@@ -106,7 +107,9 @@ class PackageForensicsScanner @Inject constructor(
             }
 
             // ---- 4. Component forensics: boot/SMS priority receivers --------
-            findings += scanComponents(pkg, label, isSystem)
+            // Only meaningful for apps NOT installed from a vetted store: a
+            // store-signed payment/OTP app reading SMS at boot is normal.
+            findings += scanComponents(pkg, label, isSystem, source.trusted, source.viaAdb)
 
             // ---- 5. Certificate analysis ------------------------------------
             signatureSha256(pkg)?.let { sha ->
@@ -175,8 +178,21 @@ class PackageForensicsScanner @Inject constructor(
      * Receivers listening for BOOT_COMPLETED / SMS_RECEIVED / PACKAGE_ADDED with
      * high priority are the persistence + interception backbone of mobile malware.
      */
-    private fun scanComponents(pkg: PackageInfo, label: String, isSystem: Boolean): List<Finding> {
+    private fun scanComponents(
+        pkg: PackageInfo,
+        label: String,
+        isSystem: Boolean,
+        trustedInstaller: Boolean,
+        viaAdb: Boolean,
+    ): List<Finding> {
         if (isSystem) return emptyList()
+        // KEY FALSE-POSITIVE FIX: a store-installed, store-signed app that reads
+        // SMS and starts at boot is normal (PhonePe, BHIM, Truecaller, banking
+        // and messaging apps all do this legitimately). We do NOT flag those.
+        // The boot+SMS pattern is only a red flag for apps the user (or an
+        // abuser) installed OUTSIDE a store, or pushed via ADB.
+        if (trustedInstaller) return emptyList()
+
         val out = mutableListOf<Finding>()
         val receivers = pkg.receivers ?: return out
         val granted = grantedPermissions(pkg).toSet()
@@ -185,17 +201,23 @@ class PackageForensicsScanner @Inject constructor(
 
         val exportedReceivers = receivers.filter { it.exported }
         if (watchesBoot && watchesSms && exportedReceivers.isNotEmpty()) {
+            // ADB-pushed apps with this pattern are far more suspicious than a
+            // merely sideloaded one, so we scale severity/confidence accordingly.
+            val severity = if (viaAdb) Severity.HIGH else Severity.MEDIUM
+            val confidence = if (viaAdb) 72 else 55
             out += Finding(
                 layer = DetectionLayer.STATIC_FORENSICS,
-                severity = Severity.MEDIUM,
-                confidence = 65,
-                title = "\"$label\" restarts at boot and intercepts SMS",
-                explanation = "This app wakes itself every time the phone restarts AND receives every incoming SMS — together with exported components, a common command-and-control setup.",
-                technicalDetail = "exported receivers: ${exportedReceivers.joinToString { it.name }}",
-                techniqueEducation = "Malware registers a BOOT_COMPLETED receiver to survive reboots and an SMS receiver (often with priority=999) to read or even swallow messages before your SMS app sees them.",
+                severity = severity,
+                confidence = confidence,
+                title = "\"$label\" starts at boot and intercepts SMS (installed outside any store)",
+                explanation = "\"$label\" was not installed from an app store" +
+                    (if (viaAdb) " (it was pushed via ADB/USB — a planting method)" else "") +
+                    ", yet it wakes at every reboot and receives your incoming SMS. For a sideloaded app this combination is worth checking; for store apps it would be normal, but this one isn't from a store.",
+                technicalDetail = "installer=${if (viaAdb) "ADB shell" else "none/unknown"}; exported receivers: ${exportedReceivers.joinToString { it.name }}",
+                techniqueEducation = "Malware registers a BOOT_COMPLETED receiver to survive reboots and an SMS receiver (often high-priority) to read or swallow messages — including OTPs — before your SMS app sees them. We only raise this for non-store apps to avoid flagging legitimate payment/OTP apps.",
                 subjectPackage = pkg.packageName,
                 subjectAppLabel = label,
-                recommendedAction = SafeActions.reviewOnly("whether \"$label\" genuinely needs SMS + auto-start (messaging apps do; flashlight apps don't)."),
+                recommendedAction = SafeActions.reviewOnly("whether you installed \"$label\" yourself and trust it; if you don't recognise it, disable it (fully reversible)."),
             )
         }
         return out

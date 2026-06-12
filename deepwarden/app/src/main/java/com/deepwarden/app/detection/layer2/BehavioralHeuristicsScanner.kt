@@ -57,8 +57,17 @@ class BehavioralHeuristicsScanner @Inject constructor(
 
             val granted = grantedPermissions(pkg)
             val score = PermissionScoring.score(granted)
-            if (score.normalised >= PermissionScoring.BAND_MEDIUM) {
-                findings += permissionFinding(pkg, pm.getApplicationLabel(app).toString(), score)
+            // Apps from a vetted store are held to a higher bar: a permission
+            // profile alone is weak evidence for a Play-Store app the user chose
+            // to install. Only surface store apps when the score is EXTREME; for
+            // sideloaded apps, the normal MEDIUM threshold applies.
+            val trusted = com.deepwarden.app.detection.common.InstallerTrust
+                .of(context, pkg.packageName).trusted
+            val threshold = if (trusted) PermissionScoring.BAND_EXTREME else PermissionScoring.BAND_MEDIUM
+            if (score.normalised >= threshold) {
+                findings += permissionFinding(
+                    pkg, pm.getApplicationLabel(app).toString(), score, trusted,
+                )
             }
         }
 
@@ -75,14 +84,27 @@ class BehavioralHeuristicsScanner @Inject constructor(
         findings to limitations
     }
 
-    private fun permissionFinding(pkg: PackageInfo, label: String, score: PermissionScoring.PermissionScore): Finding {
+    private fun permissionFinding(
+        pkg: PackageInfo,
+        label: String,
+        score: PermissionScoring.PermissionScore,
+        trustedInstaller: Boolean,
+    ): Finding {
         val severity = when {
+            // A store-installed app, even at an extreme score, is downgraded one
+            // level — we report it for awareness, not as a likely threat.
+            trustedInstaller -> Severity.MEDIUM
             score.normalised >= PermissionScoring.BAND_EXTREME -> Severity.CRITICAL
             score.normalised >= PermissionScoring.BAND_HIGH -> Severity.HIGH
             else -> Severity.MEDIUM
         }
-        // Honesty cap: permission profile alone is never >75% certain.
-        val confidence = (40 + score.normalised / 2).coerceAtMost(75)
+        // Honesty cap: permission profile alone is never >75% certain — and far
+        // less for a store app the user deliberately installed.
+        val confidence = if (trustedInstaller) {
+            (25 + score.normalised / 4).coerceAtMost(45)
+        } else {
+            (40 + score.normalised / 2).coerceAtMost(75)
+        }
         val comboText = if (score.triggeredCombos.isEmpty()) "" else
             "\n\nMatched patterns: " + score.triggeredCombos.joinToString("; ") { "${it.name} — ${it.education}" }
         return Finding(
