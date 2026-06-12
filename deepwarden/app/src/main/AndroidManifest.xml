@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  DeepWarden manifest.
+
+  PERMISSION PHILOSOPHY (Zero Data Loss / Privacy-First):
+  Every permission below is either install-time & harmless, or runtime &
+  OPTIONAL — the app fully works without the optional ones, it simply marks
+  the corresponding detection layer as "limited" and tells the user why.
+  Nothing here grants DeepWarden the ability to read personal files.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Layer 1: enumerate ALL installed packages (incl. hidden/disabled).
+         Play policy: this is the core, user-visible purpose of an anti-stalkerware
+         scanner, declared in the Play Console permissions form. -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <!-- Layer 2: background-runtime / foreground-time anomalies (special access,
+         user grants via Settings; optional). -->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+
+    <!-- Layer 4: read own/network state for proxy, VPN and Private DNS checks. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <!-- OPTIONAL one-shot fetch of threat-intel updates; OFF by default.
+         All analysis is 100% local. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Layer 6 (OPTIONAL, runtime, revocable): on-device SMS phishing scan.
+         Content never leaves the device. Removed at build time for the
+         Play flavor if policy requires (see README §Play compliance). -->
+    <uses-permission android:name="android.permission.READ_SMS" />
+
+    <!-- Scheduled deep scans survive reboot. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+    <application
+        android:name=".DeepWardenApp"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.DeepWarden"
+        tools:targetApi="35">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.DeepWarden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Hilt-aware WorkManager initialization (we provide our own factory). -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+    </application>
+</manifest>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compose draws everything; this base theme just sets the window chrome. -->
+    <style name="Theme.DeepWarden" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#070A0F</item>
+        <item name="android:statusBarColor">#070A0F</item>
+        <item name="android:navigationBarColor">#070A0F</item>
+    </style>
+</resources>

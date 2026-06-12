@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Scan reports may contain evidence about installed surveillance tooling.
+     We exclude them from device-to-device transfer & cloud backup so an
+     abuser restoring a victim's backup cannot read DeepWarden's findings. -->
+<full-backup-content>
+    <exclude domain="file" path="reports/" />
+    <exclude domain="database" path="deepwarden.db" />
+</full-backup-content>

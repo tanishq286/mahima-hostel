@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "updated": "2026-06-12",
+  "_comment": "DeepWarden responsible local IOC database. Behavioral red-flag patterns only — no exploit code, no payloads, no real campaign content. systemLookalikePatterns catch apps impersonating OS components; suspiciousPackagePatterns are generic stalkerware naming shapes.",
+  "systemLookalikePatterns": [
+    "^(android|google)\\s*(system|service|update|sync)s?$",
+    "system\\s*update",
+    "android\\s*service",
+    "device\\s*health\\s*service",
+    "^settings?\\s*(service|sync)$",
+    "^com\\.(android|google)\\.(update|syncservice|systemui2)",
+    "wifi\\s*calibrat",
+    "^play\\s*services?\\s*(update|helper)$",
+    "sim\\s*toolkit\\s*(pro|service)"
+  ],
+  "badCertSha256": [
+    "0000000000000000000000000000000000000000000000000000000000000000"
+  ],
+  "suspiciousPackagePatterns": [
+    "(^|\\.)(spy|stealth|track(er)?|monitor(ing)?|keylog|hidden(cam|app))($|\\.)",
+    "^com\\.(system|android)\\.(core|service)\\d*$",
+    "^[a-z]\\.[a-z]\\.[a-z]$",
+    "(wife|husband|partner|kid|child|employee)(track|watch|spy)"
+  ],
+  "redFlagCombos": [
+    {
+      "name": "Classic stalkerware skeleton",
+      "signals": [
+        "BIND_ACCESSIBILITY_SERVICE",
+        "ACCESS_FINE_LOCATION or ACCESS_BACKGROUND_LOCATION",
+        "REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+        "No launcher icon"
+      ],
+      "whyDangerous": "Reads everything on screen, tracks location 24/7, never sleeps, and stays invisible. Each signal alone can be legitimate; together they define stalkerware."
+    },
+    {
+      "name": "SMS command-and-control",
+      "signals": [
+        "RECEIVE_SMS with a high-priority receiver",
+        "SEND_SMS",
+        "RECEIVE_BOOT_COMPLETED",
+        "INTERNET"
+      ],
+      "whyDangerous": "Can be remote-controlled by text message, steal OTPs, and silently restart after every reboot."
+    },
+    {
+      "name": "Overlay banking trojan",
+      "signals": [
+        "SYSTEM_ALERT_WINDOW",
+        "BIND_ACCESSIBILITY_SERVICE",
+        "REQUEST_INSTALL_PACKAGES"
+      ],
+      "whyDangerous": "Draws fake login screens over real banking apps, auto-clicks its own permission grants, and can install further payloads."
+    },
+    {
+      "name": "Planted via physical access",
+      "signals": [
+        "Sideloaded (no installer recorded)",
+        "Installed while USB debugging was enabled",
+        "Device admin active for the same app"
+      ],
+      "whyDangerous": "The fingerprint of someone with hands on the phone: installed outside any store, possibly via ADB, then armored against uninstall with device-admin."
+    }
+  ]
+}
