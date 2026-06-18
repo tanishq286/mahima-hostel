@@ -89,8 +89,49 @@ class ThreatIntelRepository @Inject constructor(
     private fun safeRegex(pattern: String): Regex? =
         runCatching { Regex(pattern, RegexOption.IGNORE_CASE) }.getOrNull()
 
+    /**
+     * SELF-UPDATING THREAT INTELLIGENCE.
+     *
+     * Downloads the latest IOC rules over HTTPS and adopts them ONLY if they
+     * parse cleanly AND carry a higher version than what we already have. This
+     * is the honest version of "the app improves over time": no user data is
+     * sent (a plain GET of a public rules file), and a corrupt/older file can
+     * never weaken detection. Returns true if a newer ruleset was adopted.
+     */
+    suspend fun fetchUpdate(url: String = DEFAULT_UPDATE_URL): Boolean = withContext(Dispatchers.IO) {
+        val current = rules().version
+        val body = runCatching {
+            val conn = (java.net.URL(url).openConnection() as java.net.HttpURLConnection).apply {
+                requestMethod = "GET"
+                connectTimeout = 12_000
+                readTimeout = 12_000
+            }
+            try {
+                if (conn.responseCode != 200) return@withContext false
+                conn.inputStream.bufferedReader().use { it.readText() }
+            } finally {
+                conn.disconnect()
+            }
+        }.getOrNull() ?: return@withContext false
+
+        val parsed = runCatching { json.decodeFromString(IocRulesFile.serializer(), body) }
+            .getOrNull() ?: return@withContext false
+        if (parsed.version <= current) return@withContext false
+
+        runCatching {
+            File(context.filesDir, UPDATE_PATH).writeText(body)
+            cached = null // force reload with the new rules on next access
+        }.isSuccess
+    }
+
     private companion object {
         const val ASSET_PATH = "threat_intel/ioc_rules.json"
         const val UPDATE_PATH = "threat_intel_update.json"
+        // Public rules file in the project repo; updating it ships new detection
+        // patterns to every install with no app update required.
+        const val DEFAULT_UPDATE_URL =
+            "https://raw.githubusercontent.com/tanishq286/mahima-hostel/" +
+                "claude/phantomguard-deepforge-android-ul4zvz/" +
+                "deepwarden/app/src/main/assets/threat_intel/ioc_rules.json"
     }
 }

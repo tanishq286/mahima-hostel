@@ -47,6 +47,7 @@ class SettingsViewModel @Inject constructor(
     val scheduledHours = settings.scheduledScanHours.stateIn(viewModelScope, SharingStarted.Eagerly, 0)
     val cloudRep = settings.cloudRepEnabled.stateIn(viewModelScope, SharingStarted.Eagerly, false)
     val vtApiKey = settings.vtApiKey.stateIn(viewModelScope, SharingStarted.Eagerly, "")
+    val realtime = settings.realtimeProtection.stateIn(viewModelScope, SharingStarted.Eagerly, true)
 
     fun completeOnboarding() = viewModelScope.launch { settings.setOnboardingDone() }
     fun setSafeMode(v: Boolean) = viewModelScope.launch { settings.setSafeMode(v) }
@@ -55,6 +56,7 @@ class SettingsViewModel @Inject constructor(
     fun setContentLayer(v: Boolean) = viewModelScope.launch { settings.setContentLayerEnabled(v) }
     fun setCloudRep(v: Boolean) = viewModelScope.launch { settings.setCloudRepEnabled(v) }
     fun setVtApiKey(v: String) = viewModelScope.launch { settings.setVtApiKey(v) }
+    fun setRealtime(v: Boolean) = viewModelScope.launch { settings.setRealtimeProtection(v) }
     fun setScheduledScan(enabled: Boolean) = viewModelScope.launch {
         val hours = if (enabled) 24 else 0
         settings.setScheduledScanHours(hours)
@@ -72,12 +74,18 @@ fun SettingsScreen(vm: SettingsViewModel = hiltViewModel()) {
     val scheduled by vm.scheduledHours.collectAsState()
     val cloudRep by vm.cloudRep.collectAsState()
     val vtKey by vm.vtApiKey.collectAsState()
+    val realtime by vm.realtime.collectAsState()
 
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         Text("Settings", style = MaterialTheme.typography.headlineMedium)
+
+        Toggle(
+            "Real-time protection", realtime, vm::setRealtime,
+            "ON: the moment any new app is installed, DeepWarden checks it instantly and alerts you if it looks risky — like a live antivirus. Trusted Play Store apps are ignored; only suspicious sideloaded apps trigger an alert.",
+        )
 
         // ---- Cloud reputation (Layer 7) -----------------------------------
         Toggle(

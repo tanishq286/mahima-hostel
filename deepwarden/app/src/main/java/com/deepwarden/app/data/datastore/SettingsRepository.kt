@@ -38,6 +38,8 @@ class SettingsRepository @Inject constructor(
         val CLOUD_REP_ENABLED = booleanPreferencesKey("cloud_rep_enabled")
         /** User's own VirusTotal API key — stored locally only, never shipped. */
         val VT_API_KEY = stringPreferencesKey("vt_api_key")
+        /** Real-time protection: instantly check each newly installed app. Default ON. */
+        val REALTIME_PROTECTION = booleanPreferencesKey("realtime_protection")
     }
 
     val safeMode: Flow<Boolean> = context.dataStore.data.map { it[Keys.SAFE_MODE] ?: true }
@@ -48,6 +50,7 @@ class SettingsRepository @Inject constructor(
     val scheduledScanHours: Flow<Int> = context.dataStore.data.map { it[Keys.SCHEDULED_SCAN_HOURS] ?: 0 }
     val cloudRepEnabled: Flow<Boolean> = context.dataStore.data.map { it[Keys.CLOUD_REP_ENABLED] ?: false }
     val vtApiKey: Flow<String> = context.dataStore.data.map { it[Keys.VT_API_KEY] ?: "" }
+    val realtimeProtection: Flow<Boolean> = context.dataStore.data.map { it[Keys.REALTIME_PROTECTION] ?: true }
 
     suspend fun setSafeMode(enabled: Boolean) = context.dataStore.edit { it[Keys.SAFE_MODE] = enabled }
     suspend fun setOnboardingDone() = context.dataStore.edit { it[Keys.ONBOARDING_DONE] = true }
@@ -57,4 +60,5 @@ class SettingsRepository @Inject constructor(
     suspend fun setScheduledScanHours(hours: Int) = context.dataStore.edit { it[Keys.SCHEDULED_SCAN_HOURS] = hours }
     suspend fun setCloudRepEnabled(enabled: Boolean) = context.dataStore.edit { it[Keys.CLOUD_REP_ENABLED] = enabled }
     suspend fun setVtApiKey(key: String) = context.dataStore.edit { it[Keys.VT_API_KEY] = key.trim() }
+    suspend fun setRealtimeProtection(enabled: Boolean) = context.dataStore.edit { it[Keys.REALTIME_PROTECTION] = enabled }
 }

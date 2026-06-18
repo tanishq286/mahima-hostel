@@ -62,6 +62,18 @@
             </intent-filter>
         </activity>
 
+        <!-- Real-time protection: instant check when any new app is installed.
+             ACTION_PACKAGE_ADDED is a protected system broadcast; the receiver
+             only enqueues a WorkManager job, it does no work inline. -->
+        <receiver
+            android:name=".realtime.NewInstallReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+
         <!-- Hilt-aware WorkManager initialization (we provide our own factory). -->
         <provider
             android:name="androidx.startup.InitializationProvider"
