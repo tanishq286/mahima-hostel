@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Terminal
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -30,6 +31,7 @@ import com.deepwarden.app.ui.screens.AdbDeepScanScreen
 import com.deepwarden.app.ui.screens.DashboardScreen
 import com.deepwarden.app.ui.screens.HistoryScreen
 import com.deepwarden.app.ui.screens.OnboardingScreen
+import com.deepwarden.app.ui.screens.PrivacyAdvisorScreen
 import com.deepwarden.app.ui.screens.SafeCleanScreen
 import com.deepwarden.app.ui.screens.ScanScreen
 import com.deepwarden.app.ui.screens.SettingsScreen
@@ -44,6 +46,7 @@ object Routes {
     const val SCAN_EMERGENCY = "scan?emergency=true"
     const val ADB = "adb"
     const val CLEAN = "clean"
+    const val PRIVACY = "privacy"
     const val HISTORY = "history"
     const val SETTINGS = "settings"
 }
@@ -56,6 +59,7 @@ fun DeepWardenRoot(integrityProblems: List<String>) {
 
     val tabs = listOf(
         Triple(Routes.DASHBOARD, Icons.Filled.Security, "Guard"),
+        Triple(Routes.PRIVACY, Icons.Filled.Visibility, "Privacy"),
         Triple(Routes.ADB, Icons.Filled.Terminal, "Deep"),
         Triple(Routes.CLEAN, Icons.Filled.CleaningServices, "Clean"),
         Triple(Routes.HISTORY, Icons.Filled.History, "History"),
@@ -120,6 +124,7 @@ fun DeepWardenRoot(integrityProblems: List<String>) {
                     ScanScreen(emergency = entry.arguments?.getString("emergency") == "true")
                 }
                 composable(Routes.SCAN) { ScanScreen(emergency = false) }
+                composable(Routes.PRIVACY) { PrivacyAdvisorScreen() }
                 composable(Routes.ADB) { AdbDeepScanScreen() }
                 composable(Routes.CLEAN) { SafeCleanScreen() }
                 composable(Routes.HISTORY) { HistoryScreen() }
