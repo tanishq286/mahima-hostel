@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -39,6 +40,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
+
+/** Process-level guard so the auto-scan fires once per app launch. */
+object AutoScanState {
+    @Volatile var alreadyRan: Boolean = false
+}
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
@@ -67,6 +73,15 @@ fun DashboardScreen(
 ) {
     val latest by vm.latestScan.collectAsState()
     val previous by vm.previousScan.collectAsState()
+
+    // Auto-scan the whole system once per app launch (like a real AV opening).
+    // Guarded by a process-level flag so it runs once, not on every revisit.
+    LaunchedEffect(Unit) {
+        if (!AutoScanState.alreadyRan) {
+            AutoScanState.alreadyRan = true
+            onStartScan()
+        }
+    }
 
     Column(
         Modifier

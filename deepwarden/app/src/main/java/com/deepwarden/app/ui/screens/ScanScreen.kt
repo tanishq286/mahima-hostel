@@ -109,6 +109,8 @@ fun ScanScreen(emergency: Boolean, vm: ScanViewModel = hiltViewModel()) {
     val result by vm.result.collectAsState()
     val plan by vm.plan.collectAsState()
     val exportPath by vm.exportPath.collectAsState()
+    // Concise report: extra/awareness items stay hidden until the user asks.
+    var showDetails by remember { mutableStateOf(false) }
 
     LazyColumn(
         Modifier.fillMaxSize().padding(20.dp),
@@ -160,36 +162,67 @@ fun ScanScreen(emergency: Boolean, vm: ScanViewModel = hiltViewModel()) {
             }
 
             plan?.let { p ->
-                item {
-                    Text("Safe action plan", style = MaterialTheme.typography.titleMedium, color = DwColors.CalmGreen)
-                    if (p.safeModeActive) {
+                val attackSteps = p.steps.filter { ThreatClassifier.categoryOf(it.finding).isAttack }
+                val otherSteps = p.steps.filter { !ThreatClassifier.categoryOf(it.finding).isAttack }
+
+                // NECESSARY part: the threats to remove. Shown first, always.
+                if (attackSteps.isNotEmpty()) {
+                    item {
+                        Text("Remove these threats", style = MaterialTheme.typography.titleMedium, color = DwColors.DangerRed)
+                        if (p.safeModeActive) {
+                            Text(
+                                "Safe Mode is ON: actions are reversible and never delete your photos, files or important apps.",
+                                style = MaterialTheme.typography.labelMedium, color = DwColors.CalmGreen,
+                            )
+                        }
+                    }
+                    items(attackSteps) { step -> PlanStepCard(step) }
+                } else {
+                    item {
                         Text(
-                            "Safe Mode is ON: every step below is reversible and loses no data.",
-                            style = MaterialTheme.typography.labelMedium, color = DwColors.CalmGreen,
+                            "Nothing to remove — no active threats need action.",
+                            style = MaterialTheme.typography.titleMedium, color = DwColors.CalmGreen,
                         )
                     }
                 }
-                items(p.steps) { step ->
-                    PlanStepCard(step)
+
+                // EVERYTHING ELSE collapsed by default, so the report stays clean.
+                item {
+                    OutlinedButton(
+                        onClick = { showDetails = !showDetails },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(
+                            if (showDetails) "Hide extra details"
+                            else "Show ${otherSteps.size} item(s) to review + what we couldn't see",
+                        )
+                    }
                 }
-                p.factoryResetAdvice?.let { advice ->
-                    item {
-                        Card(colors = CardDefaults.cardColors(containerColor = DwColors.SurfaceHigh)) {
-                            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Text("About factory reset", style = MaterialTheme.typography.titleSmall, color = DwColors.WarnOrange)
-                                Text(advice, style = MaterialTheme.typography.bodySmall, color = DwColors.TextSecondary)
+                if (showDetails) {
+                    if (otherSteps.isNotEmpty()) {
+                        item {
+                            Text("Worth reviewing (not active attacks)", style = MaterialTheme.typography.titleSmall, color = DwColors.WarnOrange)
+                        }
+                        items(otherSteps) { step -> PlanStepCard(step) }
+                    }
+                    p.factoryResetAdvice?.let { advice ->
+                        item {
+                            Card(colors = CardDefaults.cardColors(containerColor = DwColors.SurfaceHigh)) {
+                                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    Text("About factory reset", style = MaterialTheme.typography.titleSmall, color = DwColors.WarnOrange)
+                                    Text(advice, style = MaterialTheme.typography.bodySmall, color = DwColors.TextSecondary)
+                                }
                             }
                         }
                     }
-                }
-            }
-
-            item {
-                Card(colors = CardDefaults.cardColors(containerColor = DwColors.Surface)) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("What this scan could NOT see", style = MaterialTheme.typography.titleSmall, color = DwColors.WarnOrange)
-                        res.limitations.forEach {
-                            Text("• $it", style = MaterialTheme.typography.bodySmall, color = DwColors.TextSecondary)
+                    item {
+                        Card(colors = CardDefaults.cardColors(containerColor = DwColors.Surface)) {
+                            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text("What this scan could NOT see", style = MaterialTheme.typography.titleSmall, color = DwColors.WarnOrange)
+                                res.limitations.forEach {
+                                    Text("• $it", style = MaterialTheme.typography.bodySmall, color = DwColors.TextSecondary)
+                                }
+                            }
                         }
                     }
                 }
