@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -26,10 +28,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.deepwarden.app.core.ActionType
 import com.deepwarden.app.core.DetectionLayer
 import com.deepwarden.app.core.Finding
 import com.deepwarden.app.core.ScanResult
@@ -37,6 +41,7 @@ import com.deepwarden.app.detection.engine.ScanOrchestrator
 import com.deepwarden.app.data.datastore.SettingsRepository
 import com.deepwarden.app.remediation.SafeRemediationEngine
 import com.deepwarden.app.report.ForensicReportExporter
+import com.deepwarden.app.ui.RemediationLauncher
 import com.deepwarden.app.ui.theme.DwColors
 import com.deepwarden.app.ui.theme.severityColor
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -225,8 +230,9 @@ fun FindingCard(finding: Finding) {
 
 @Composable
 private fun PlanStepCard(step: SafeRemediationEngine.PlanStep) {
+    val context = LocalContext.current
     Card(colors = CardDefaults.cardColors(containerColor = DwColors.SurfaceHigh)) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text("Step ${step.order}: ${step.finding.title}", style = MaterialTheme.typography.titleSmall)
             if (step.downgradedForSafeMode) {
                 Text("Safe Mode swapped a destructive action for a reversible one.", style = MaterialTheme.typography.labelSmall, color = DwColors.CalmGreen)
@@ -235,6 +241,28 @@ private fun PlanStepCard(step: SafeRemediationEngine.PlanStep) {
             Text("Why this is safe: ${step.action.whySafe}", style = MaterialTheme.typography.bodySmall, color = DwColors.CalmGreen)
             Text("Data impact: ${step.action.dataLossImpact.userLabel}", style = MaterialTheme.typography.labelSmall, color = DwColors.TextSecondary)
             Text("Undo: ${step.action.undoInstructions}", style = MaterialTheme.typography.labelSmall, color = DwColors.TextSecondary)
+
+            // One-tap "remove it safely": launches Android's own screen/dialog.
+            val intent = remember(step.finding.id) { RemediationLauncher.intentFor(context, step.finding) }
+            if (intent != null) {
+                val isRemoval = step.action.type == ActionType.UNINSTALL_APP ||
+                    step.action.type == ActionType.CLEAR_APP_DATA
+                Button(
+                    onClick = { runCatching { context.startActivity(intent) } },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = if (isRemoval) {
+                        ButtonDefaults.buttonColors(containerColor = DwColors.DangerRed)
+                    } else {
+                        ButtonDefaults.buttonColors()
+                    },
+                ) {
+                    Text(RemediationLauncher.buttonLabel(step.finding))
+                }
+                Text(
+                    "Android will ask you to confirm — nothing happens until you tap its button.",
+                    style = MaterialTheme.typography.labelSmall, color = DwColors.TextSecondary,
+                )
+            }
         }
     }
 }
