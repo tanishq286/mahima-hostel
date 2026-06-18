@@ -37,6 +37,7 @@ import com.deepwarden.app.core.ActionType
 import com.deepwarden.app.core.DetectionLayer
 import com.deepwarden.app.core.Finding
 import com.deepwarden.app.core.ScanResult
+import com.deepwarden.app.core.ThreatClassifier
 import com.deepwarden.app.detection.engine.ScanOrchestrator
 import com.deepwarden.app.data.datastore.SettingsRepository
 import com.deepwarden.app.remediation.SafeRemediationEngine
@@ -144,10 +145,11 @@ fun ScanScreen(emergency: Boolean, vm: ScanViewModel = hiltViewModel()) {
 
         // ---- final result --------------------------------------------------------
         result?.let { res ->
+            item { AttackVerdictCard(res.findings) }
             item {
                 Text(
-                    "Scan complete — ${res.findings.size} finding(s), device score ${res.deviceThreatScore.overall}/100 (confidence ${res.deviceThreatScore.confidence}%)",
-                    style = MaterialTheme.typography.titleMedium,
+                    "Device score ${res.deviceThreatScore.overall}/100 (confidence ${res.deviceThreatScore.confidence}%)",
+                    style = MaterialTheme.typography.labelMedium, color = DwColors.TextSecondary,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(onClick = { vm.exportReports() }) { Text("Export report (PDF + JSON)") }
@@ -228,11 +230,76 @@ fun FindingCard(finding: Finding) {
     }
 }
 
+/**
+ * Big verdict at the top of the results: tells the user in plain language what
+ * was found — "1 malware, 2 spyware, 1 phishing" — instead of a flat app list.
+ */
+@Composable
+private fun AttackVerdictCard(findings: List<Finding>) {
+    val groups = ThreatClassifier.summarize(findings)
+    val attackGroups = groups.filter { it.first.isAttack && it.second.isNotEmpty() }
+    val awarenessGroups = groups.filter { !it.first.isAttack && it.second.isNotEmpty() }
+    val underAttack = attackGroups.isNotEmpty()
+
+    Card(
+        Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = if (underAttack) DwColors.DangerRed.copy(alpha = 0.18f) else DwColors.Surface,
+        ),
+    ) {
+        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (underAttack) {
+                Text(
+                    "⚠ Threats detected",
+                    style = MaterialTheme.typography.headlineSmall, color = DwColors.DangerRed,
+                )
+                Text(
+                    "DeepWarden found signs of the following. Tap any item below for the safe removal steps.",
+                    style = MaterialTheme.typography.bodyMedium, color = DwColors.TextPrimary,
+                )
+                attackGroups.forEach { (cat, list) ->
+                    VerdictRow(cat.label, list.size, cat.blurb, DwColors.DangerRed)
+                }
+            } else {
+                Text(
+                    "✓ No active attacks detected",
+                    style = MaterialTheme.typography.headlineSmall, color = DwColors.CalmGreen,
+                )
+                Text(
+                    "No malware, phishing, spyware or network attacks were found. Stay aware, not afraid.",
+                    style = MaterialTheme.typography.bodyMedium, color = DwColors.TextSecondary,
+                )
+            }
+            if (awarenessGroups.isNotEmpty()) {
+                HorizontalDivider()
+                Text("Worth reviewing (not active attacks):", style = MaterialTheme.typography.labelMedium, color = DwColors.WarnOrange)
+                awarenessGroups.forEach { (cat, list) ->
+                    VerdictRow(cat.label, list.size, cat.blurb, DwColors.WarnOrange)
+                }
+            }
+            Text(
+                "Honest note: this checks what a non-root app can see. It cannot prove the phone is 100% clean — no app can without root.",
+                style = MaterialTheme.typography.labelSmall, color = DwColors.TextSecondary,
+            )
+        }
+    }
+}
+
+@Composable
+private fun VerdictRow(label: String, count: Int, blurb: String, accent: androidx.compose.ui.graphics.Color) {
+    Column {
+        Text("$label — $count found", style = MaterialTheme.typography.titleSmall, color = accent)
+        Text(blurb, style = MaterialTheme.typography.bodySmall, color = DwColors.TextSecondary)
+    }
+}
+
 @Composable
 private fun PlanStepCard(step: SafeRemediationEngine.PlanStep) {
     val context = LocalContext.current
+    val category = remember(step.finding.id) { ThreatClassifier.categoryOf(step.finding) }
     Card(colors = CardDefaults.cardColors(containerColor = DwColors.SurfaceHigh)) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(category.label.uppercase(), style = MaterialTheme.typography.labelSmall, color = severityColor(step.finding.severity.name))
             Text("Step ${step.order}: ${step.finding.title}", style = MaterialTheme.typography.titleSmall)
             if (step.downgradedForSafeMode) {
                 Text("Safe Mode swapped a destructive action for a reversible one.", style = MaterialTheme.typography.labelSmall, color = DwColors.CalmGreen)
