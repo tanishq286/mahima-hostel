@@ -74,6 +74,31 @@
             </intent-filter>
         </receiver>
 
+        <!-- Real call blocking via the official call-screening API. Active only
+             after the user grants DeepWarden the call-screening role. -->
+        <service
+            android:name=".callblock.DeepWardenCallScreeningService"
+            android:permission="android.permission.BIND_SCREENING_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.telecom.CallScreeningService" />
+            </intent-filter>
+        </service>
+
+        <!-- Intruder Alert: device admin that watches for failed unlocks only.
+             No wipe/lock powers (see res/xml/device_admin.xml). -->
+        <receiver
+            android:name=".intruder.DeepWardenAdminReceiver"
+            android:permission="android.permission.BIND_DEVICE_ADMIN"
+            android:exported="true">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+
         <!-- Hilt-aware WorkManager initialization (we provide our own factory). -->
         <provider
             android:name="androidx.startup.InitializationProvider"

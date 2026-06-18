@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Minimal device-admin policy: we ONLY watch for failed logins (intruder
+     alerts). We deliberately do NOT request wipe, lock, or password-control
+     powers — DeepWarden never gains the ability to lock you out or erase data. -->
+<device-admin xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-policies>
+        <watch-login />
+    </uses-policies>
+</device-admin>

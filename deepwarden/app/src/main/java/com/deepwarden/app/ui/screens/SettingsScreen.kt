@@ -1,5 +1,7 @@
 package com.deepwarden.app.ui.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,27 +10,44 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.deepwarden.app.callblock.CallBlockPrefs
 import com.deepwarden.app.data.datastore.SettingsRepository
+import com.deepwarden.app.intruder.DeepWardenAdminReceiver
+import com.deepwarden.app.intruder.IntruderLog
 import com.deepwarden.app.ui.theme.DwColors
 import com.deepwarden.app.work.ScheduledScanWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import android.app.admin.DevicePolicyManager
+import android.app.role.RoleManager
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.os.Build
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -131,10 +150,127 @@ fun SettingsScreen(vm: SettingsViewModel = hiltViewModel()) {
             "OFF by default. When ON: shares ONLY anonymous indicator hashes of confirmed threats (never apps lists, never content, never identifiers) to improve the shared rules.",
         )
 
+        DefenseControls()
+
         Text(
-            "DeepWarden never sells data, has no accounts, and works fully offline. The two network toggles above are the only network features in the app.",
+            "DeepWarden never sells data, has no accounts, and works fully offline. The network features above are the only ones in the app.",
             style = MaterialTheme.typography.bodySmall, color = DwColors.TextSecondary,
         )
+    }
+}
+
+/**
+ * Call blocking + Intruder Alert controls. Kept honest: call blocking uses the
+ * official screening role; intruder alert uses a watch-login device admin that
+ * has NO power to lock or wipe the phone.
+ */
+@Composable
+private fun DefenseControls() {
+    val context = LocalContext.current
+
+    // ---- Call blocking -----------------------------------------------------
+    var blockHidden by remember { mutableStateOf(CallBlockPrefs.blockHidden(context)) }
+    var blocked by remember { mutableStateOf(CallBlockPrefs.blockedNumbers(context).toList()) }
+    var newNumber by remember { mutableStateOf("") }
+    val roleLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { /* result handled by system; nothing to do */ }
+
+    Card(colors = CardDefaults.cardColors(containerColor = DwColors.Surface)) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Call blocking", style = MaterialTheme.typography.titleSmall, color = DwColors.ElectricBlue)
+            Text(
+                "Block spam, hidden and blacklisted numbers automatically using Android's official call-screening. Grant the role once:",
+                style = MaterialTheme.typography.bodySmall, color = DwColors.TextSecondary,
+            )
+            Button(
+                onClick = {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        val rm = context.getSystemService(RoleManager::class.java)
+                        if (rm != null && rm.isRoleAvailable(RoleManager.ROLE_CALL_SCREENING)) {
+                            runCatching { roleLauncher.launch(rm.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)) }
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) { Text("Set DeepWarden as call screener") }
+
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text("Block hidden / unknown (no-number) calls", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                Switch(checked = blockHidden, onCheckedChange = {
+                    blockHidden = it; CallBlockPrefs.setBlockHidden(context, it)
+                })
+            }
+
+            OutlinedTextField(
+                value = newNumber,
+                onValueChange = { newNumber = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Add number to block") },
+                singleLine = true,
+            )
+            OutlinedButton(
+                onClick = {
+                    CallBlockPrefs.addBlocked(context, newNumber)
+                    blocked = CallBlockPrefs.blockedNumbers(context).toList()
+                    newNumber = ""
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) { Text("Block this number") }
+
+            if (blocked.isNotEmpty()) {
+                Text("Blocked numbers:", style = MaterialTheme.typography.labelMedium, color = DwColors.TextSecondary)
+                blocked.forEach { num ->
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(num, style = MaterialTheme.typography.bodyMedium)
+                        TextButton(onClick = {
+                            CallBlockPrefs.removeBlocked(context, num)
+                            blocked = CallBlockPrefs.blockedNumbers(context).toList()
+                        }) { Text("Remove") }
+                    }
+                }
+            }
+        }
+    }
+
+    // ---- Intruder Alert ----------------------------------------------------
+    var events by remember { mutableStateOf(IntruderLog.recentEvents(context)) }
+    val adminLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { events = IntruderLog.recentEvents(context) }
+
+    Card(colors = CardDefaults.cardColors(containerColor = DwColors.Surface)) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Intruder Alert", style = MaterialTheme.typography.titleSmall, color = DwColors.ElectricBlue)
+            Text(
+                "Detects when someone enters the wrong screen lock and alerts you instantly. " +
+                    "Note: Android blocks apps from using the camera while locked, so a secret \"selfie\" of the intruder is not possible on modern phones without root — DeepWarden alerts you to the attempt instead. It can never lock or wipe your phone.",
+                style = MaterialTheme.typography.bodySmall, color = DwColors.TextSecondary,
+            )
+            Button(
+                onClick = {
+                    val comp = ComponentName(context, DeepWardenAdminReceiver::class.java)
+                    val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
+                        .putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, comp)
+                        .putExtra(
+                            DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                            "Enable Intruder Alert: DeepWarden will warn you about failed unlock attempts. It only watches logins — it cannot lock or erase your phone.",
+                        )
+                    runCatching { adminLauncher.launch(intent) }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) { Text("Enable Intruder Alert") }
+
+            if (events.isNotEmpty()) {
+                Text("Recent failed unlocks:", style = MaterialTheme.typography.labelMedium, color = DwColors.WarnOrange)
+                events.forEach { e ->
+                    Text("• $e", style = MaterialTheme.typography.bodySmall, color = DwColors.TextSecondary)
+                }
+                TextButton(onClick = { IntruderLog.clear(context); events = emptyList() }) { Text("Clear log") }
+            } else {
+                Text("No failed unlock attempts recorded.", style = MaterialTheme.typography.bodySmall, color = DwColors.CalmGreen)
+            }
+        }
     }
 }
 
