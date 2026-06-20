@@ -111,17 +111,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderGallery('all');
 
-  // Load gallery items from gallery.json (managed via admin.html)
-  fetch('gallery.json', { cache: 'no-store' })
+  // Load gallery from Vercel Blob API, fall back to repo gallery.json
+  const applyGallery = (data) => {
+    if (Array.isArray(data.items) && data.items.length) {
+      galleryMedia = data.items;
+      const activeFilter = document.querySelector('.filter-btn.active');
+      renderGallery(activeFilter ? activeFilter.dataset.filter : 'all');
+    }
+  };
+
+  fetch('/api/gallery', { cache: 'no-store' })
     .then(res => res.ok ? res.json() : Promise.reject())
     .then(data => {
-      if (Array.isArray(data.items) && data.items.length) {
-        galleryMedia = data.items;
-        const activeFilter = document.querySelector('.filter-btn.active');
-        renderGallery(activeFilter ? activeFilter.dataset.filter : 'all');
-      }
+      if (data.items && data.items.length) { applyGallery(data); return; }
+      throw new Error('empty');
     })
-    .catch(() => { /* keep fallback list */ });
+    .catch(() =>
+      fetch('gallery.json', { cache: 'no-store' })
+        .then(res => res.ok ? res.json() : Promise.reject())
+        .then(applyGallery)
+        .catch(() => { /* keep hardcoded fallback */ })
+    );
 
   /* ----- 4. Lightbox ----- */
   const lightbox = document.getElementById('lightbox');
