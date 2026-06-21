@@ -25,7 +25,7 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   if (req.method === 'GET') {
-    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=10, stale-while-revalidate=30');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     try {
       return res.status(200).json(await readGallery());
     } catch {
