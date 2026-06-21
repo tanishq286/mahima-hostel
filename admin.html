@@ -65,8 +65,8 @@
     <div class="admin-card" id="upload-card" style="display:none;">
       <h3 style="margin-bottom:12px;">3. Add Photo / Video</h3>
       <div class="form-group">
-        <label class="form-label" for="file">Choose file (photo or video, max 500 MB)</label>
-        <input class="form-control" type="file" id="file" accept="image/*,video/mp4,video/webm">
+        <label class="form-label" for="file">Choose files (photos or videos, up to 500 MB each — select multiple)</label>
+        <input class="form-control" type="file" id="file" accept="image/*,video/mp4,video/webm" multiple>
       </div>
       <div class="admin-row" style="margin-bottom:16px;">
         <div class="form-group">
@@ -162,40 +162,52 @@
     };
 
     const uploadItem = async () => {
-      const file = $('file').files[0];
-      if (!file) { setStatus('upload-status', 'Please choose a file first.', false); return; }
-      if (file.size > MAX_FILE_MB * 1024 * 1024) {
-        setStatus('upload-status', `File too large (max ${MAX_FILE_MB} MB).`, false);
+      const files = Array.from($('file').files);
+      if (!files.length) { setStatus('upload-status', 'Please choose at least one file.', false); return; }
+
+      const oversize = files.find(f => f.size > MAX_FILE_MB * 1024 * 1024);
+      if (oversize) {
+        setStatus('upload-status', `"${oversize.name}" is larger than ${MAX_FILE_MB} MB.`, false);
         return;
       }
-      const caption = $('caption').value.trim() || file.name.replace(/\.[^.]+$/, '');
-      const category = $('category').value;
-      const safe = Date.now() + '-' + file.name.toLowerCase().replace(/[^a-z0-9.]+/g, '-');
 
+      const baseCaption = $('caption').value.trim();
+      const category = $('category').value;
       $('upload-btn').disabled = true;
-      setStatus('upload-status', 'Uploading... please wait', true);
-      try {
-        await upload('gallery/' + safe, file, {
-          access: 'public',
-          handleUploadUrl: '/api/gallery-upload',
-          contentType: file.type,
-          clientPayload: JSON.stringify({
-            password,
-            category,
-            alt: caption,
-            fileType: file.type,
-          }),
-        });
-        // Refresh list (item was registered server-side via onUploadCompleted)
-        gallery = await api('GET');
-        renderList();
-        $('file').value = '';
-        $('caption').value = '';
-        setStatus('upload-status', 'Uploaded! Live site updates in ~1 minute.', true);
-      } catch (err) {
-        setStatus('upload-status', 'Failed: ' + err.message, false);
-      } finally {
-        $('upload-btn').disabled = false;
+
+      let ok = 0, failed = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const caption = (baseCaption ? (files.length > 1 ? `${baseCaption} ${i + 1}` : baseCaption) : file.name.replace(/\.[^.]+$/, ''));
+        const safe = Date.now() + '-' + i + '-' + file.name.toLowerCase().replace(/[^a-z0-9.]+/g, '-');
+        setStatus('upload-status', `Uploading ${i + 1} of ${files.length}: ${file.name}`, true);
+        try {
+          await upload('gallery/' + safe, file, {
+            access: 'public',
+            handleUploadUrl: '/api/gallery-upload',
+            contentType: file.type,
+            clientPayload: JSON.stringify({
+              password,
+              category,
+              alt: caption,
+              fileType: file.type,
+            }),
+          });
+          ok++;
+        } catch (err) {
+          failed.push(`${file.name}: ${err.message}`);
+        }
+      }
+
+      try { gallery = await api('GET'); renderList(); } catch (_) {}
+      $('file').value = '';
+      $('caption').value = '';
+      $('upload-btn').disabled = false;
+
+      if (failed.length === 0) {
+        setStatus('upload-status', `Uploaded ${ok} file${ok > 1 ? 's' : ''}. Live site updates in ~1 minute.`, true);
+      } else {
+        setStatus('upload-status', `Uploaded ${ok}, failed ${failed.length}: ${failed.join(' | ')}`, false);
       }
     };
 
