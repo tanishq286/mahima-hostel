@@ -175,13 +175,13 @@
       const category = $('category').value;
       $('upload-btn').disabled = true;
 
-      let ok = 0, failed = [];
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+      const CONCURRENCY = 5;
+      let ok = 0, failed = [], done = 0;
+
+      const uploadOne = async (file, i) => {
         const caption = (baseCaption ? (files.length > 1 ? `${baseCaption} ${i + 1}` : baseCaption) : file.name.replace(/\.[^.]+$/, ''));
         const safe = Date.now() + '-' + i + '-' + file.name.toLowerCase().replace(/[^a-z0-9.]+/g, '-');
         const type = (file.type || '').startsWith('video') ? 'video' : 'image';
-        setStatus('upload-status', `Uploading ${i + 1} of ${files.length}: ${file.name}`, true);
         try {
           const blob = await upload('gallery/' + safe, file, {
             access: 'public',
@@ -189,11 +189,32 @@
             contentType: file.type,
             clientPayload: JSON.stringify({ password, fileType: file.type }),
           });
-          // Explicit registration — guarantees gallery.json is updated before we move on
-          await api('POST', { blobUrl: blob.url, type, category, alt: caption });
+          return { ok: true, blobUrl: blob.url, type, category, alt: caption, name: file.name };
+        } catch (err) {
+          return { ok: false, name: file.name, error: err.message };
+        } finally {
+          done++;
+          setStatus('upload-status', `Uploading... ${done} of ${files.length} done`, true);
+        }
+      };
+
+      // Run uploads in parallel batches (fast); collect results in order
+      const results = new Array(files.length);
+      for (let i = 0; i < files.length; i += CONCURRENCY) {
+        const batch = files.slice(i, i + CONCURRENCY);
+        const batchResults = await Promise.all(batch.map((f, j) => uploadOne(f, i + j)));
+        batchResults.forEach((r, j) => { results[i + j] = r; });
+      }
+
+      // Register successful uploads sequentially (gallery.json write is read-modify-write)
+      setStatus('upload-status', 'Finalizing...', true);
+      for (const r of results) {
+        if (!r.ok) { failed.push(`${r.name}: ${r.error}`); continue; }
+        try {
+          await api('POST', { blobUrl: r.blobUrl, type: r.type, category: r.category, alt: r.alt });
           ok++;
         } catch (err) {
-          failed.push(`${file.name}: ${err.message}`);
+          failed.push(`${r.name}: ${err.message}`);
         }
       }
 
