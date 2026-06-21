@@ -1,13 +1,5 @@
 const { put, del, list } = require('@vercel/blob');
 
-module.exports.config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '4mb',
-    },
-  },
-};
-
 async function readGallery() {
   if (!process.env.BLOB_READ_WRITE_TOKEN) return { items: [] };
   const { blobs } = await list({ prefix: 'gallery.json', limit: 1 });
@@ -42,37 +34,26 @@ module.exports = async function handler(req, res) {
 
   const pwd = req.headers['x-gallery-password'];
   if (!pwd || pwd !== process.env.GALLERY_PASSWORD) {
-    return res.status(401).json({ error: 'Wrong password.' });
+    return res.status(401).json({ error: 'Wrong gallery password.' });
   }
 
   if (req.method === 'POST') {
-    const { fileContent, fileName, fileType, category, alt } = req.body;
-    if (!fileContent || !fileName) {
-      return res.status(400).json({ error: 'fileContent and fileName are required.' });
-    }
-
-    const buf = Buffer.from(fileContent, 'base64');
-    const safe = Date.now() + '-' + fileName.toLowerCase().replace(/[^a-z0-9.]+/g, '-');
-    const blob = await put('gallery/' + safe, buf, {
-      access: 'public',
-      contentType: fileType || 'application/octet-stream',
-      addRandomSuffix: false,
-    });
-
+    const { blobUrl, type, category, alt } = req.body || {};
+    if (!blobUrl) return res.status(400).json({ error: 'blobUrl is required.' });
     const gallery = await readGallery();
     gallery.items.push({
-      type: (fileType || '').startsWith('video') ? 'video' : 'image',
+      type: type || 'image',
       category: category || 'facilities',
-      src: blob.url,
-      blobUrl: blob.url,
-      alt: alt || safe,
+      src: blobUrl,
+      blobUrl,
+      alt: alt || blobUrl.split('/').pop(),
     });
     await writeGallery(gallery);
     return res.status(200).json({ ok: true, gallery });
   }
 
   if (req.method === 'DELETE') {
-    const { index } = req.body;
+    const { index } = req.body || {};
     const gallery = await readGallery();
     if (typeof index !== 'number' || index < 0 || index >= gallery.items.length) {
       return res.status(400).json({ error: 'Invalid index.' });

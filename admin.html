@@ -180,19 +180,17 @@
         const file = files[i];
         const caption = (baseCaption ? (files.length > 1 ? `${baseCaption} ${i + 1}` : baseCaption) : file.name.replace(/\.[^.]+$/, ''));
         const safe = Date.now() + '-' + i + '-' + file.name.toLowerCase().replace(/[^a-z0-9.]+/g, '-');
+        const type = (file.type || '').startsWith('video') ? 'video' : 'image';
         setStatus('upload-status', `Uploading ${i + 1} of ${files.length}: ${file.name}`, true);
         try {
-          await upload('gallery/' + safe, file, {
+          const blob = await upload('gallery/' + safe, file, {
             access: 'public',
             handleUploadUrl: '/api/gallery-upload',
             contentType: file.type,
-            clientPayload: JSON.stringify({
-              password,
-              category,
-              alt: caption,
-              fileType: file.type,
-            }),
+            clientPayload: JSON.stringify({ password, fileType: file.type }),
           });
+          // Explicit registration — guarantees gallery.json is updated before we move on
+          await api('POST', { blobUrl: blob.url, type, category, alt: caption });
           ok++;
         } catch (err) {
           failed.push(`${file.name}: ${err.message}`);
