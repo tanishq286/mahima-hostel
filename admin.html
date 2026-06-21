@@ -65,7 +65,7 @@
     <div class="admin-card" id="upload-card" style="display:none;">
       <h3 style="margin-bottom:12px;">3. Add Photo / Video</h3>
       <div class="form-group">
-        <label class="form-label" for="file">Choose file (photo or short video, max 3 MB)</label>
+        <label class="form-label" for="file">Choose file (photo or video, max 500 MB)</label>
         <input class="form-control" type="file" id="file" accept="image/*,video/mp4,video/webm">
       </div>
       <div class="admin-row" style="margin-bottom:16px;">
@@ -88,8 +88,10 @@
     <p style="text-align:center;"><a href="index.html" style="color:var(--color-accent-hover);font-weight:600;">&larr; Back to website</a></p>
   </div>
 
-  <script>
-    const MAX_FILE_MB = 3;
+  <script type="module">
+    import { upload } from 'https://esm.sh/@vercel/blob@0.27.0/client';
+
+    const MAX_FILE_MB = 500;
     let password = localStorage.getItem('mh_gallery_pwd') || '';
     let gallery = { items: [] };
 
@@ -163,27 +165,29 @@
       const file = $('file').files[0];
       if (!file) { setStatus('upload-status', 'Please choose a file first.', false); return; }
       if (file.size > MAX_FILE_MB * 1024 * 1024) {
-        setStatus('upload-status', `File too large (max ${MAX_FILE_MB} MB). Please compress it and retry.`, false);
+        setStatus('upload-status', `File too large (max ${MAX_FILE_MB} MB).`, false);
         return;
       }
       const caption = $('caption').value.trim() || file.name.replace(/\.[^.]+$/, '');
+      const category = $('category').value;
+      const safe = Date.now() + '-' + file.name.toLowerCase().replace(/[^a-z0-9.]+/g, '-');
+
       $('upload-btn').disabled = true;
       setStatus('upload-status', 'Uploading... please wait', true);
       try {
-        const fileContent = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result.split(',')[1]);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
+        await upload('gallery/' + safe, file, {
+          access: 'public',
+          handleUploadUrl: '/api/gallery-upload',
+          contentType: file.type,
+          clientPayload: JSON.stringify({
+            password,
+            category,
+            alt: caption,
+            fileType: file.type,
+          }),
         });
-        const data = await api('POST', {
-          fileContent,
-          fileName: file.name,
-          fileType: file.type,
-          category: $('category').value,
-          alt: caption,
-        });
-        gallery = data.gallery;
+        // Refresh list (item was registered server-side via onUploadCompleted)
+        gallery = await api('GET');
         renderList();
         $('file').value = '';
         $('caption').value = '';
