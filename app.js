@@ -61,62 +61,79 @@ document.addEventListener('DOMContentLoaded', () => {
   mobileMenuBtn.addEventListener('click', () => toggleMenu(false));
   navLinksList.forEach(link => link.addEventListener('click', () => toggleMenu(true)));
 
-  /* ----- 3. Render gallery + filtering ----- */
-  const galleryGrid = document.getElementById('gallery-grid');
-  const filterBtns = document.querySelectorAll('.filter-btn');
+  /* ----- 3. Render gallery carousel ----- */
+  const carousel = document.getElementById('gallery-carousel');
+  const dotsWrap = document.getElementById('carousel-dots');
+  const prevBtn = document.querySelector('[data-carousel-prev]');
+  const nextBtn = document.querySelector('[data-carousel-next]');
 
-  const renderGallery = (filter = 'all') => {
-    galleryGrid.innerHTML = '';
+  const renderGallery = () => {
+    if (!carousel) return;
+    carousel.innerHTML = '';
+    dotsWrap.innerHTML = '';
     galleryMedia.forEach((media, index) => {
-      if (filter !== 'all' && media.category !== filter) return;
-      const item = document.createElement('div');
-      item.className = 'gallery-item';
-      item.dataset.category = media.category;
-      item.dataset.index = index;
-      item.setAttribute('role', 'button');
-      item.setAttribute('tabindex', '0');
-      item.setAttribute('aria-label', `Open ${media.alt}`);
+      const slide = document.createElement('div');
+      slide.className = 'gallery-slide';
+      slide.dataset.index = index;
+      slide.setAttribute('role', 'button');
+      slide.setAttribute('tabindex', '0');
+      slide.setAttribute('aria-label', `Open ${media.alt}`);
 
       if (media.type === 'video') {
-        item.innerHTML = `
+        slide.innerHTML = `
           <video src="${media.src}" ${media.poster ? `poster="${media.poster}"` : ''} muted playsinline></video>
-          <div class="gallery-overlay">
-            <span class="gallery-video-tag">▶ Video</span>
-          </div>`;
+          <span class="gallery-video-tag">▶ Video</span>
+          ${media.alt ? `<div class="gallery-caption">${media.alt}</div>` : ''}`;
       } else {
-        item.innerHTML = `
+        slide.innerHTML = `
           <img src="${media.src}" alt="${media.alt}" loading="lazy">
-          <div class="gallery-overlay">
-            <svg class="gallery-zoom-icon" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>
-            </svg>
-          </div>`;
+          ${media.alt ? `<div class="gallery-caption">${media.alt}</div>` : ''}`;
       }
 
-      item.addEventListener('click', () => openLightbox(index, filter));
-      item.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(index, filter); }
+      slide.addEventListener('click', () => openLightbox(index, 'all'));
+      slide.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(index, 'all'); }
       });
-      galleryGrid.appendChild(item);
+      carousel.appendChild(slide);
+
+      const dot = document.createElement('button');
+      dot.className = 'carousel-dot' + (index === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
+      dot.addEventListener('click', () => scrollToSlide(index));
+      dotsWrap.appendChild(dot);
     });
   };
 
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderGallery(btn.dataset.filter);
-    });
+  const scrollToSlide = (index) => {
+    const slide = carousel.children[index];
+    if (slide) carousel.scrollTo({ left: slide.offsetLeft - carousel.offsetLeft, behavior: 'smooth' });
+  };
+
+  const getCurrentSlideIndex = () => {
+    const slideWidth = carousel.children[0]?.getBoundingClientRect().width || 1;
+    const gap = 16;
+    return Math.round(carousel.scrollLeft / (slideWidth + gap));
+  };
+
+  if (prevBtn) prevBtn.addEventListener('click', () => {
+    scrollToSlide(Math.max(0, getCurrentSlideIndex() - 1));
+  });
+  if (nextBtn) nextBtn.addEventListener('click', () => {
+    scrollToSlide(Math.min(galleryMedia.length - 1, getCurrentSlideIndex() + 1));
   });
 
-  renderGallery('all');
+  if (carousel) carousel.addEventListener('scroll', () => {
+    const current = getCurrentSlideIndex();
+    dotsWrap.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === current));
+  });
+
+  renderGallery();
 
   // Load gallery from Vercel Blob API, fall back to repo gallery.json
   const applyGallery = (data) => {
     if (Array.isArray(data.items) && data.items.length) {
       galleryMedia = data.items;
-      const activeFilter = document.querySelector('.filter-btn.active');
-      renderGallery(activeFilter ? activeFilter.dataset.filter : 'all');
+      renderGallery();
     }
   };
 

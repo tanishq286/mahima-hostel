@@ -19,7 +19,7 @@ async function writeGallery(data) {
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-gallery-password');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -51,6 +51,13 @@ module.exports = async function handler(req, res) {
     });
     await writeGallery(gallery);
     return res.status(200).json({ ok: true, gallery });
+  }
+
+  if (req.method === 'PUT') {
+    const { items } = req.body || {};
+    if (!Array.isArray(items)) return res.status(400).json({ error: 'items array required.' });
+    await writeGallery({ items });
+    return res.status(200).json({ ok: true, gallery: { items } });
   }
 
   if (req.method === 'DELETE') {

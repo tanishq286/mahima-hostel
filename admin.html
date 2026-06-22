@@ -134,15 +134,39 @@
           : `<img src="${mediaSrc}" alt="" loading="lazy">`;
         card.innerHTML = `${media}
           <button class="admin-del" title="Delete" data-i="${i}">&times;</button>
+          <button class="admin-move admin-move-up" title="Move up" data-up="${i}" ${i === 0 ? 'disabled' : ''}>&uarr;</button>
+          <button class="admin-move admin-move-down" title="Move down" data-down="${i}" ${i === gallery.items.length - 1 ? 'disabled' : ''}>&darr;</button>
           <div class="admin-item-meta">
             <strong>${item.alt || item.src.split('/').pop()}</strong>
-            ${item.category} &middot; ${item.type}
+            <span style="display:block">#${i + 1} &middot; ${item.category} &middot; ${item.type}</span>
           </div>`;
         list.appendChild(card);
       });
       list.querySelectorAll('.admin-del').forEach(btn => {
         btn.addEventListener('click', () => deleteItem(parseInt(btn.dataset.i, 10), btn));
       });
+      list.querySelectorAll('[data-up]').forEach(btn => {
+        btn.addEventListener('click', () => moveItem(parseInt(btn.dataset.up, 10), -1));
+      });
+      list.querySelectorAll('[data-down]').forEach(btn => {
+        btn.addEventListener('click', () => moveItem(parseInt(btn.dataset.down, 10), 1));
+      });
+    };
+
+    const moveItem = async (index, delta) => {
+      const target = index + delta;
+      if (target < 0 || target >= gallery.items.length) return;
+      const items = gallery.items.slice();
+      [items[index], items[target]] = [items[target], items[index]];
+      setStatus('list-status', 'Saving order...', true);
+      try {
+        const data = await api('PUT', { items });
+        gallery = data.gallery;
+        renderList();
+        setStatus('list-status', 'Order updated. Live site reflects in seconds.', true);
+      } catch (err) {
+        setStatus('list-status', 'Failed: ' + err.message, false);
+      }
     };
 
     const deleteItem = async (index, btn) => {

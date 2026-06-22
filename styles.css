@@ -1656,3 +1656,128 @@ textarea.form-control {
     text-align: center;
   }
 }
+
+/* ---------- Gallery Carousel ---------- */
+.gallery-carousel-wrap { position: relative; }
+.gallery-carousel {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px 4px 16px;
+  scrollbar-width: none;
+}
+.gallery-carousel::-webkit-scrollbar { display: none; }
+.gallery-slide {
+  flex: 0 0 calc(100% - 12px);
+  scroll-snap-align: center;
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  background: var(--color-bg-light);
+  cursor: pointer;
+  aspect-ratio: 16 / 10;
+}
+.gallery-slide img,
+.gallery-slide video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.gallery-slide .gallery-video-tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.gallery-slide .gallery-caption {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  color: #fff;
+  padding: 32px 16px 14px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.95);
+  color: var(--color-text-dark);
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.carousel-arrow:hover { background: #fff; }
+.carousel-prev { left: -8px; }
+.carousel-next { right: -8px; }
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.carousel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-card-border);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s, transform 0.2s;
+}
+.carousel-dot.active {
+  background: var(--color-accent);
+  transform: scale(1.2);
+}
+@media (min-width: 768px) {
+  .gallery-slide { flex: 0 0 calc(50% - 8px); aspect-ratio: 4 / 3; }
+}
+@media (min-width: 1100px) {
+  .gallery-slide { flex: 0 0 calc(33.333% - 11px); }
+  .carousel-prev { left: -20px; }
+  .carousel-next { right: -20px; }
+}
+
+/* ---------- Admin reorder controls ---------- */
+.admin-move {
+  position: absolute;
+  bottom: 6px;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  border: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.admin-move-up { left: 6px; }
+.admin-move-down { left: 38px; }
+.admin-move:disabled { opacity: 0.3; cursor: not-allowed; }
