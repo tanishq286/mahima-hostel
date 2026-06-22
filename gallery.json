@@ -1,8 +1,3 @@
 {
-  "items": [
-    { "type": "image", "category": "rooms", "src": "assets/room_single.png", "alt": "Single Sharing Room Interior" },
-    { "type": "image", "category": "rooms", "src": "assets/room_double.png", "alt": "Double Sharing Room Interior" },
-    { "type": "image", "category": "facilities", "src": "assets/mess.png", "alt": "Clean Student Mess Dining" },
-    { "type": "image", "category": "facilities", "src": "assets/gym.png", "alt": "On-site Gym Facility" }
-  ]
+  "items": []
 }

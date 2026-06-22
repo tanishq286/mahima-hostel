@@ -18,14 +18,7 @@ const WHATSAPP_NUMBER = '918209810772';
  * directly in the repo (developer). The list below is only a
  * fallback if gallery.json fails to load.
  * ------------------------------------------------------------ */
-let galleryMedia = [
-  { type: 'image', category: 'rooms',      src: 'assets/room_single.png',  alt: 'Single Sharing Room Interior' },
-  { type: 'image', category: 'rooms',      src: 'assets/room_double.png',  alt: 'Double Sharing Room Interior' },
-  { type: 'image', category: 'facilities', src: 'assets/mess.png',         alt: 'Clean Student Mess Dining' },
-  { type: 'image', category: 'facilities', src: 'assets/gym.png',          alt: 'On-site Gym Facility' },
-  // Example video entry (uncomment and replace src with a real video file):
-  // { type: 'video', category: 'facilities', src: 'assets/tour.mp4', poster: 'assets/mess.png', alt: 'PG Walkthrough Video' },
-];
+let galleryMedia = [];
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -129,11 +122,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderGallery();
 
+  // Replace placeholder photos throughout the page with uploaded gallery photos
+  const swapPlaceholderImages = () => {
+    const images = Array.isArray(galleryMedia) ? galleryMedia.filter(m => m.type !== 'video') : [];
+    if (!images.length) return;
+    const roomImages = images.filter(m => m.category === 'rooms');
+    document.querySelectorAll('[data-dyn-img]').forEach(el => {
+      const spec = el.getAttribute('data-dyn-img') || '';
+      let pick;
+      if (spec.includes(':')) {
+        const [cat, idxStr] = spec.split(':');
+        const idx = parseInt(idxStr, 10) || 0;
+        const pool = cat === 'rooms' ? roomImages : images;
+        pick = pool[idx] || pool[0] || images[idx] || images[0];
+      } else {
+        const idx = parseInt(spec, 10) || 0;
+        pick = images[idx] || images[0];
+      }
+      if (pick && pick.src) el.src = pick.src;
+    });
+  };
+
   // Load gallery from Vercel Blob API, fall back to repo gallery.json
   const applyGallery = (data) => {
     if (Array.isArray(data.items) && data.items.length) {
       galleryMedia = data.items;
       renderGallery();
+      swapPlaceholderImages();
     }
   };
 
